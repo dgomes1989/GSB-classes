@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OB 374 — Interpersonal Dynamics Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+  :root {
+    --teal: #0d8a8a; --teal-light: #e8f6f6; --teal-mid: #b2e0de;
+    --green: #5a9a3c; --green-light: #edf5e8;
+    --warm: #f9f6f1; --warm-dark: #f0ebe3;
+    --coral: #e87461; --coral-light: #fdf0ee;
+    --blue: #4a7fb5; --blue-light: #edf3fa;
+    --purple: #7b6ba5; --purple-light: #f3f0f8;
+    --gold: #c9a84c; --gold-light: #faf6eb;
+    --text: #2d3436; --text-light: #636e72; --white: #ffffff;
+    --shadow: 0 2px 16px rgba(0,0,0,0.06);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.1);
+    --radius: 16px; --radius-sm: 10px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',-apple-system,sans-serif; background:var(--warm); color:var(--text); line-height:1.6; -webkit-font-smoothing:antialiased; }
+
+  /* HERO */
+  .hero { background:linear-gradient(135deg,#0d8a8a 0%,#1a6b5a 50%,#2d5a3c 100%); color:white; padding:60px 40px 50px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-50%; right:-20%; width:600px; height:600px; background:radial-gradient(circle,rgba(255,255,255,0.08) 0%,transparent 70%); border-radius:50%; }
+  .hero-content { max-width:1200px; margin:0 auto; position:relative; z-index:1; }
+  .hero-badge { display:inline-block; background:rgba(255,255,255,0.15); backdrop-filter:blur(10px); padding:6px 16px; border-radius:20px; font-size:13px; font-weight:500; letter-spacing:1px; text-transform:uppercase; margin-bottom:16px; }
+  .hero h1 { font-family:'Playfair Display',serif; font-size:48px; font-weight:600; line-height:1.2; margin-bottom:12px; }
+  .hero-sub { font-size:18px; opacity:0.85; font-weight:300; max-width:650px; }
+  .hero-meta { margin-top:24px; display:flex; gap:24px; flex-wrap:wrap; }
+  .hero-meta span { display:flex; align-items:center; gap:6px; font-size:14px; opacity:0.8; }
+  .hero-hint { margin-top:20px; font-size:13px; opacity:0.6; font-style:italic; }
+
+  /* NAV */
+  .nav-bar { background:var(--white); border-bottom:1px solid rgba(0,0,0,0.06); position:sticky; top:0; z-index:100; padding:0 40px; box-shadow:0 1px 8px rgba(0,0,0,0.04); }
+  .nav-inner { max-width:1200px; margin:0 auto; display:flex; gap:4px; overflow-x:auto; scrollbar-width:none; padding:8px 0; }
+  .nav-inner::-webkit-scrollbar { display:none; }
+  .nav-btn { padding:8px 16px; border:none; background:transparent; color:var(--text-light); font-size:13px; font-weight:500; cursor:pointer; border-radius:8px; white-space:nowrap; transition:all 0.2s; font-family:'Inter',sans-serif; }
+  .nav-btn:hover { background:var(--teal-light); color:var(--teal); }
+  .nav-btn.active { background:var(--teal); color:white; }
+
+  .main { max-width:1200px; margin:0 auto; padding:40px; }
+
+  /* OVERVIEW */
+  .overview-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:48px; }
+  .stat-card { background:var(--white); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); text-align:center; transition:transform 0.2s; }
+  .stat-card:hover { transform:translateY(-2px); }
+  .stat-icon { font-size:32px; margin-bottom:8px; }
+  .stat-num { font-size:28px; font-weight:700; color:var(--teal); }
+  .stat-label { font-size:13px; color:var(--text-light); margin-top:4px; }
+
+  /* TENETS */
+  .tenets-banner { background:linear-gradient(135deg,var(--teal-light) 0%,#e0f0ef 100%); border-radius:var(--radius); padding:36px; margin-bottom:48px; border:1px solid var(--teal-mid); }
+  .tenets-banner h2 { font-family:'Playfair Display',serif; font-size:24px; color:var(--teal); margin-bottom:20px; }
+  .tenets-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:14px; }
+  .tenet-item { display:flex; align-items:flex-start; gap:12px; background:rgba(255,255,255,0.7); padding:14px 16px; border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s; border:2px solid transparent; }
+  .tenet-item:hover { background:rgba(255,255,255,0.95); border-color:var(--teal-mid); transform:translateY(-1px); }
+  .tenet-num { width:28px; height:28px; min-width:28px; background:var(--teal); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; }
+  .tenet-text { font-size:14px; line-height:1.5; }
+  .tenet-text strong { color:var(--teal); }
+  .tenet-click { font-size:11px; color:var(--teal); opacity:0.7; margin-top:4px; }
+
+  /* SECTIONS */
+  .section { margin-bottom:48px; scroll-margin-top:70px; }
+  .section-header { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+  .section-week { background:var(--teal); color:white; width:52px; height:52px; min-width:52px; border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; line-height:1.2; }
+  .section-week span { font-size:20px; font-weight:700; }
+  .section-title { font-family:'Playfair Display',serif; font-size:28px; font-weight:600; }
+  .section-subtitle { font-size:14px; color:var(--text-light); margin-top:2px; }
+
+  /* CARDS */
+  .cards-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:20px; }
+  .card { background:var(--white); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow); transition:all 0.25s; border-top:4px solid transparent; cursor:pointer; position:relative; }
+  .card:hover { box-shadow:var(--shadow-hover); transform:translateY(-3px); }
+  .card.teal { border-top-color:var(--teal); }
+  .card.green { border-top-color:var(--green); }
+  .card.coral { border-top-color:var(--coral); }
+  .card.blue { border-top-color:var(--blue); }
+  .card.purple { border-top-color:var(--purple); }
+  .card.gold { border-top-color:var(--gold); }
+  .card-tag { display:inline-block; padding:3px 10px; border-radius:6px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
+  .tag-framework { background:var(--teal-light); color:var(--teal); }
+  .tag-model { background:var(--blue-light); color:var(--blue); }
+  .tag-skill { background:var(--green-light); color:var(--green); }
+  .tag-concept { background:var(--purple-light); color:var(--purple); }
+  .tag-practice { background:var(--coral-light); color:var(--coral); }
+  .tag-tool { background:var(--gold-light); color:var(--gold); }
+  .card h3 { font-size:18px; font-weight:600; margin-bottom:10px; }
+  .card p { font-size:14px; color:var(--text-light); line-height:1.65; margin-bottom:12px; }
+  .card p:last-child { margin-bottom:0; }
+  .card-expand { display:flex; align-items:center; gap:6px; margin-top:14px; padding-top:14px; border-top:1px solid rgba(0,0,0,0.06); font-size:13px; font-weight:600; color:var(--teal); }
+  .card-expand svg { transition:transform 0.2s; }
+  .card:hover .card-expand svg { transform:translateX(3px); }
+
+  /* DIAGRAMS */
+  .diagram { background:var(--warm); border-radius:var(--radius-sm); padding:20px; margin:12px 0; }
+  .cycle-row { display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; }
+  .cycle-step { padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; color:white; text-align:center; }
+  .cycle-arrow { color:var(--text-light); font-size:18px; }
+  .zone-bar { display:flex; border-radius:10px; overflow:hidden; height:44px; margin:12px 0; }
+  .zone-bar > div { display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:white; }
+  .matrix-2x2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0; }
+  .matrix-cell { padding:12px; border-radius:8px; font-size:13px; text-align:center; font-weight:500; }
+  .levels-stack { display:flex; flex-direction:column; gap:6px; margin:12px 0; }
+  .level-bar { display:flex; align-items:center; gap:10px; padding:8px 14px; border-radius:8px; font-size:13px; font-weight:500; }
+  .level-num { width:24px; height:24px; min-width:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:white; }
+  .net-model { display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; margin:12px 0; }
+  .net-side { padding:14px; border-radius:var(--radius-sm); font-size:13px; }
+  .net-center { padding:14px 18px; border-radius:var(--radius-sm); font-size:13px; text-align:center; font-weight:600; }
+  .scarf-row { display:flex; gap:6px; flex-wrap:wrap; margin:10px 0; }
+  .scarf-chip { padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600; }
+  .reap-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:12px 0; }
+  .reap-step { text-align:center; padding:14px 8px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; }
+  .reap-step .letter { font-size:28px; font-weight:700; display:block; margin-bottom:4px; }
+  .mini-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; margin:12px 0; }
+  .mini-item { padding:10px; border-radius:8px; text-align:center; font-size:12px; font-weight:500; }
+  .card-full { background:var(--white); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow); margin-bottom:20px; border-left:4px solid var(--teal); }
+  .card-full h3 { font-size:18px; font-weight:600; margin-bottom:10px; }
+  .card-full p { font-size:14px; color:var(--text-light); line-height:1.65; }
+
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:1000; display:none; align-items:center; justify-content:center; padding:20px; opacity:0; transition:opacity 0.3s; }
+  .modal-overlay.show { display:flex; opacity:1; }
+  .modal { background:var(--white); border-radius:20px; max-width:800px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); position:relative; animation:modalIn 0.3s ease; }
+  @keyframes modalIn { from { transform:translateY(20px) scale(0.97); opacity:0; } to { transform:translateY(0) scale(1); opacity:1; } }
+  .modal-close { position:sticky; top:0; right:0; float:right; width:40px; height:40px; border:none; background:var(--warm); border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--text-light); z-index:10; margin:16px 16px 0 0; transition:all 0.2s; }
+  .modal-close:hover { background:var(--coral-light); color:var(--coral); }
+  .modal-header { padding:0 36px 20px; border-bottom:1px solid rgba(0,0,0,0.06); }
+  .modal-header .card-tag { margin-bottom:8px; }
+  .modal-header h2 { font-family:'Playfair Display',serif; font-size:28px; font-weight:600; margin-bottom:6px; }
+  .modal-header .modal-week { font-size:13px; color:var(--text-light); }
+  .modal-body { padding:28px 36px 36px; }
+  .modal-body h4 { font-size:16px; font-weight:600; margin:24px 0 10px; color:var(--text); display:flex; align-items:center; gap:8px; }
+  .modal-body h4:first-child { margin-top:0; }
+  .modal-body p { font-size:14px; color:var(--text-light); line-height:1.75; margin-bottom:12px; }
+  .modal-body ul { margin:8px 0 16px 20px; }
+  .modal-body li { font-size:14px; color:var(--text-light); line-height:1.7; margin-bottom:6px; }
+  .modal-section { margin-bottom:24px; }
+  .detail-box { padding:16px; border-radius:var(--radius-sm); margin:12px 0; font-size:14px; line-height:1.7; }
+  .example-box { background:var(--warm); border-left:3px solid var(--gold); padding:16px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin:12px 0; }
+  .example-box .label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--gold); margin-bottom:6px; }
+  .exercise-box { background:var(--green-light); border-left:3px solid var(--green); padding:16px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin:12px 0; }
+  .exercise-box .label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--green); margin-bottom:6px; }
+  .reflection-box { background:var(--purple-light); border-left:3px solid var(--purple); padding:16px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin:12px 0; }
+  .reflection-box .label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--purple); margin-bottom:6px; }
+  .related-chips { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+  .related-chip { padding:6px 14px; border-radius:20px; font-size:12px; font-weight:500; background:var(--warm); color:var(--text); cursor:pointer; transition:all 0.2s; border:1px solid rgba(0,0,0,0.08); }
+  .related-chip:hover { background:var(--teal-light); color:var(--teal); border-color:var(--teal-mid); }
+  .quote-block { background:linear-gradient(135deg,var(--warm-dark) 0%,var(--warm) 100%); border-left:4px solid var(--gold); padding:20px 24px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin:16px 0; font-style:italic; font-size:15px; line-height:1.7; }
+  .quote-author { font-style:normal; font-weight:600; font-size:13px; color:var(--text-light); margin-top:8px; }
+
+  /* TABS inside modal */
+  .modal-tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:2px solid var(--warm); padding-bottom:0; }
+  .modal-tab { padding:8px 16px; border:none; background:transparent; color:var(--text-light); font-size:13px; font-weight:500; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; font-family:'Inter',sans-serif; }
+  .modal-tab:hover { color:var(--teal); }
+  .modal-tab.active { color:var(--teal); border-bottom-color:var(--teal); font-weight:600; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  .footer { text-align:center; padding:40px; color:var(--text-light); font-size:13px; border-top:1px solid rgba(0,0,0,0.06); margin-top:24px; }
+
+  @media (max-width:768px) {
+    .hero { padding:40px 20px; } .hero h1 { font-size:32px; }
+    .main { padding:24px 16px; } .cards-row { grid-template-columns:1fr; }
+    .nav-bar { padding:0 16px; } .reap-steps { grid-template-columns:repeat(2,1fr); }
+    .net-model { grid-template-columns:1fr; } .tenets-grid { grid-template-columns:1fr; }
+    .modal { max-height:92vh; border-radius:16px; }
+    .modal-header h2 { font-size:22px; }
+    .modal-body { padding:20px; }
+  }
+
+  [data-theme="dark"] {
+    --teal: #14b8b8; --teal-light: #1a3535; --teal-mid: #1e4a47;
+    --green: #7bc55e; --green-light: #1a2e15;
+    --warm: #1a1917; --warm-dark: #242220;
+    --coral: #f08b7a; --coral-light: #2e1f1c;
+    --blue: #6ba0d6; --blue-light: #1a2535;
+    --purple: #a090cc; --purple-light: #231f30;
+    --gold: #ddb85a; --gold-light: #2a2515;
+    --text: #e0ddd8; --text-light: #a0998f; --white: #2a2826;
+    --shadow: 0 2px 16px rgba(0,0,0,0.2);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.3);
+  }
+  [data-theme="dark"] .hero { background:linear-gradient(135deg,#0a6868 0%,#134d42 50%,#1f3d2a 100%); }
+  [data-theme="dark"] .nav-bar { background:#2a2826; border-bottom-color:rgba(255,255,255,0.06); }
+  [data-theme="dark"] .tenets-banner { background:linear-gradient(135deg,#1a3535 0%,#1e3330 100%); border-color:#1e4a47; }
+  [data-theme="dark"] .tenet-item { background:rgba(42,40,38,0.7); }
+  [data-theme="dark"] .tenet-item:hover { background:rgba(42,40,38,0.95); }
+  [data-theme="dark"] .stat-card, [data-theme="dark"] .card { background:#2a2826; }
+  [data-theme="dark"] .card-expand { border-top-color:rgba(255,255,255,0.06); }
+  [data-theme="dark"] body { background:#1a1917; }
+
+  .back-btn { position:absolute; top:20px; left:20px; z-index:10; display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; background:rgba(255,255,255,0.15); backdrop-filter:blur(10px); color:white; text-decoration:none; font-size:14px; font-weight:500; transition:all 0.3s; border:1px solid rgba(255,255,255,0.2); }
+  .back-btn:hover { background:rgba(255,255,255,0.25); transform:translateX(-2px); }
+
+  .fixed-controls { position:fixed; bottom:2rem; right:2rem; display:flex; flex-direction:column; gap:0.75rem; z-index:200; }
+  .control-btn { width:48px; height:48px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.3rem; box-shadow:0 4px 12px rgba(0,0,0,0.15); transition:all 0.3s; }
+  .control-btn:hover { transform:scale(1.1); }
+  .dark-toggle { background:var(--teal); color:white; }
+  .search-toggle { background:#fff; color:var(--teal); border:2px solid var(--teal); }
+  [data-theme="dark"] .search-toggle { background:#2a2826; }
+  .flash-toggle { background:#fff; color:var(--gold); border:2px solid var(--gold); }
+  [data-theme="dark"] .flash-toggle { background:#2a2826; }
+
+  .search-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:300; justify-content:center; padding-top:10vh; }
+  .search-overlay.show { display:flex; }
+  .search-container { background:var(--white); border-radius:var(--radius); padding:24px; width:90%; max-width:700px; max-height:70vh; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; display:flex; flex-direction:column; }
+  .search-input { width:100%; padding:14px 18px; border:2px solid var(--teal-mid); border-radius:var(--radius-sm); font-size:16px; font-family:'Inter',sans-serif; background:var(--warm); color:var(--text); outline:none; }
+  .search-input:focus { border-color:var(--teal); }
+  .search-results { overflow-y:auto; margin-top:16px; flex:1; }
+  .search-item { padding:12px 16px; border-radius:var(--radius-sm); cursor:pointer; transition:all 0.2s; border-bottom:1px solid rgba(0,0,0,0.04); }
+  .search-item:hover { background:var(--teal-light); }
+  .search-item-title { font-weight:600; font-size:15px; color:var(--text); }
+  .search-item-tag { font-size:11px; text-transform:uppercase; letter-spacing:0.5px; padding:2px 8px; border-radius:4px; margin-left:8px; }
+  .search-item-preview { font-size:13px; color:var(--text-light); margin-top:4px; }
+  .search-count { font-size:13px; color:var(--text-light); margin-top:8px; }
+
+  .flashcard-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:400; justify-content:center; align-items:center; flex-direction:column; }
+  .flashcard-overlay.show { display:flex; }
+  .flashcard-header { color:white; text-align:center; margin-bottom:2rem; }
+  .flashcard-header h2 { font-family:'Playfair Display',serif; font-size:28px; margin-bottom:8px; }
+  .flashcard-progress { font-size:14px; opacity:0.7; }
+  .flashcard-wrapper { perspective:1000px; width:600px; max-width:90vw; height:380px; }
+  .flashcard-inner { position:relative; width:100%; height:100%; transition:transform 0.6s; transform-style:preserve-3d; cursor:pointer; }
+  .flashcard-inner.flipped { transform:rotateY(180deg); }
+  .flashcard-face { position:absolute; width:100%; height:100%; backface-visibility:hidden; border-radius:var(--radius); padding:40px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+  .flashcard-front { background:linear-gradient(135deg,#0d8a8a,#1a6b5a); color:white; }
+  .flashcard-front h3 { font-family:'Playfair Display',serif; font-size:24px; line-height:1.4; }
+  .flashcard-front .hint { font-size:13px; opacity:0.6; margin-top:16px; }
+  .flashcard-back { background:white; color:var(--text); transform:rotateY(180deg); overflow-y:auto; }
+  .flashcard-back p { font-size:15px; line-height:1.7; }
+  .flashcard-back .tag { display:inline-block; margin-bottom:12px; padding:3px 10px; border-radius:6px; font-size:11px; font-weight:600; text-transform:uppercase; background:var(--teal-light); color:var(--teal); }
+  .flashcard-nav { display:flex; gap:16px; margin-top:2rem; }
+  .flashcard-nav button { padding:12px 28px; border:none; border-radius:var(--radius-sm); cursor:pointer; font-size:15px; font-weight:600; font-family:'Inter',sans-serif; transition:all 0.2s; }
+  .fc-prev, .fc-next { background:rgba(255,255,255,0.15); color:white; }
+  .fc-prev:hover, .fc-next:hover { background:rgba(255,255,255,0.25); }
+  .fc-close { background:var(--coral); color:white; }
+  .fc-close:hover { background:#d05a48; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-content">
+    <a href="index.html" class="back-btn">← Back to Hub</a>
+    <div class="hero-badge">Stanford GSB &middot; Fall 2023</div>
+    <h1>OB 374: Interpersonal Dynamics</h1>
+    <p class="hero-sub">An interactive guide to every framework, model, and key learning from Stanford's legendary "Touchy Feely" course. Click any card to dive deeper.</p>
+    <div class="hero-meta">
+      <span><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Leslie Chin</span>
+      <span><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 9 Weeks + Weekend Retreat</span>
+      <span><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> T-Groups of 12</span>
+    </div>
+    <p class="hero-hint">Click any card below to explore detailed breakdowns, examples, exercises &amp; reflection questions.</p>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-bar"><div class="nav-inner">
+  <button class="nav-btn active" onclick="scrollTo_('overview')">Overview</button>
+  <button class="nav-btn" onclick="scrollTo_('tenets')">Core Tenets</button>
+  <button class="nav-btn" onclick="scrollTo_('week1')">Week 1</button>
+  <button class="nav-btn" onclick="scrollTo_('week2')">Week 2</button>
+  <button class="nav-btn" onclick="scrollTo_('week3')">Week 3</button>
+  <button class="nav-btn" onclick="scrollTo_('week4')">Week 4</button>
+  <button class="nav-btn" onclick="scrollTo_('week5')">Week 5</button>
+  <button class="nav-btn" onclick="scrollTo_('week6')">Week 6</button>
+  <button class="nav-btn" onclick="scrollTo_('week78')">Weeks 7-8</button>
+  <button class="nav-btn" onclick="scrollTo_('week9')">Week 9</button>
+</div></div>
+
+<div class="main">
+
+<!-- OVERVIEW -->
+<div class="section" id="overview">
+  <div class="overview-grid">
+    <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-num">3</div><div class="stat-label">Course Objectives</div><p style="font-size:12px;color:var(--text-light);margin-top:8px">Build open relationships &middot; Identify learning goals &middot; Learn how to learn</p></div>
+    <div class="stat-card"><div class="stat-icon">🔄</div><div class="stat-num">12+</div><div class="stat-label">Key Frameworks</div><p style="font-size:12px;color:var(--text-light);margin-top:8px">From Johari Window to SCARF to the Net Model</p></div>
+    <div class="stat-card"><div class="stat-icon">💡</div><div class="stat-num">4</div><div class="stat-label">Core Skill Areas</div><p style="font-size:12px;color:var(--text-light);margin-top:8px">Self-Awareness &middot; Social Awareness &middot; Self-Management &middot; Relationship Skills</p></div>
+    <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-num">6</div><div class="stat-label">Course Tenets</div><p style="font-size:12px;color:var(--text-light);margin-top:8px">Foundational principles for interpersonal learning</p></div>
+  </div>
+  <div class="card-full"><h3>How Learning is Evaluated</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;">
+      <div style="flex:1;min-width:160px;background:var(--teal-light);padding:16px;border-radius:var(--radius-sm);text-align:center;"><div style="font-size:28px;font-weight:700;color:var(--teal);">⅓</div><div style="font-size:13px;font-weight:600;margin-top:4px;">Written Work</div><div style="font-size:12px;color:var(--text-light);margin-top:4px;">Journals, assignments, final paper</div></div>
+      <div style="flex:1;min-width:160px;background:var(--coral-light);padding:16px;border-radius:var(--radius-sm);text-align:center;"><div style="font-size:28px;font-weight:700;color:var(--coral);">⅓</div><div style="font-size:13px;font-weight:600;margin-top:4px;">Stretching (15%)</div><div style="font-size:12px;color:var(--text-light);margin-top:4px;">Stepping outside your comfort zone</div></div>
+      <div style="flex:1;min-width:160px;background:var(--green-light);padding:16px;border-radius:var(--radius-sm);text-align:center;"><div style="font-size:28px;font-weight:700;color:var(--green);">⅓</div><div style="font-size:13px;font-weight:600;margin-top:4px;">Helping Others Learn</div><div style="font-size:12px;color:var(--text-light);margin-top:4px;">Contributing to others' growth</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TENETS -->
+<div class="section" id="tenets">
+  <div class="tenets-banner"><h2>The Six Course Tenets</h2><p style="font-size:13px;color:var(--text-light);margin-bottom:16px;">Click any tenet to explore it in depth.</p>
+    <div class="tenets-grid">
+      <div class="tenet-item" onclick="openModal('tenet1')"><div class="tenet-num">1</div><div><div class="tenet-text"><strong>Reflection</strong> expands self and other awareness</div><div class="tenet-click">Click to learn more →</div></div></div>
+      <div class="tenet-item" onclick="openModal('tenet2')"><div class="tenet-num">2</div><div><div class="tenet-text"><strong>Self-regulation</strong> increases agency and choice</div><div class="tenet-click">Click to learn more →</div></div></div>
+      <div class="tenet-item" onclick="openModal('tenet3')"><div class="tenet-num">3</div><div><div class="tenet-text"><strong>Self-disclosure</strong> is a hook for engagement and connection</div><div class="tenet-click">Click to learn more →</div></div></div>
+      <div class="tenet-item" onclick="openModal('tenet4')"><div class="tenet-num">4</div><div><div class="tenet-text"><strong>Vulnerability</strong> can quicken and deepen connection</div><div class="tenet-click">Click to learn more →</div></div></div>
+      <div class="tenet-item" onclick="openModal('tenet5')"><div class="tenet-num">5</div><div><div class="tenet-text">Responding with <strong>care and inquiry</strong> builds trust</div><div class="tenet-click">Click to learn more →</div></div></div>
+      <div class="tenet-item" onclick="openModal('tenet6')"><div class="tenet-num">6</div><div><div class="tenet-text"><strong>Tough care</strong> and challenge can strengthen relationships</div><div class="tenet-click">Click to learn more →</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- WEEK 1 -->
+<div class="section" id="week1">
+  <div class="section-header"><div class="section-week">WEEK<span>1</span></div><div><div class="section-title">Foundations of Experiential Learning</div><div class="section-subtitle">Sessions 1a, 1b, 1c — Experiential Learning, Psychological Safety & Launching T-Groups</div></div></div>
+  <div class="cards-row">
+    <div class="card teal" onclick="openModal('elc')"><span class="card-tag tag-framework">Framework</span><h3>Experiential Learning Cycle</h3><p>The engine of the entire course. Real learning happens by iterating through action and reflection.</p>
+      <div class="diagram"><div class="cycle-row"><div class="cycle-step" style="background:var(--teal);">Goals & Action</div><div class="cycle-arrow">→</div><div class="cycle-step" style="background:var(--blue);">Collect Data</div><div class="cycle-arrow">→</div><div class="cycle-step" style="background:var(--green);">Reflect & Refine</div><div class="cycle-arrow">↻</div></div></div>
+      <div class="card-expand">Explore framework in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card coral" onclick="openModal('zone15')"><span class="card-tag tag-concept">Concept</span><h3>The 15% Zone of Learning</h3><p>Growth happens just beyond your comfort zone. The sweet spot is about 15% outside comfort.</p>
+      <div class="zone-bar"><div style="width:35%;background:#7bc67e;">Comfort Zone</div><div style="width:30%;background:var(--coral);font-size:13px;font-weight:700;">15% Learning</div><div style="width:35%;background:#c0392b;">Danger Zone</div></div>
+      <div class="card-expand">Explore concept in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card green" onclick="openModal('competence')"><span class="card-tag tag-model">Model</span><h3>Conscious / Unconscious × Skilled / Unskilled</h3><p>Four stages of learning progression — awareness is always the first step.</p>
+      <div class="matrix-2x2">
+        <div class="matrix-cell" style="background:#e8f6f6;color:var(--teal);"><strong>Conscious Unskilled</strong></div>
+        <div class="matrix-cell" style="background:#d4edda;color:var(--green);"><strong>Conscious Skilled</strong></div>
+        <div class="matrix-cell" style="background:#fdf0ee;color:var(--coral);"><strong>Unconscious Unskilled</strong></div>
+        <div class="matrix-cell" style="background:#f3f0f8;color:var(--purple);"><strong>Unconscious Skilled</strong></div>
+      </div>
+      <div class="card-expand">Explore model in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card blue" onclick="openModal('skills4')"><span class="card-tag tag-skill">Skill Areas</span><h3>Four Core Skill Domains</h3><p>Interpersonal effectiveness across four interconnected areas.</p>
+      <div class="matrix-2x2">
+        <div class="matrix-cell" style="background:var(--teal-light);"><strong>Self-Awareness</strong></div>
+        <div class="matrix-cell" style="background:var(--blue-light);"><strong>Social Awareness</strong></div>
+        <div class="matrix-cell" style="background:var(--coral-light);"><strong>Self-Management</strong></div>
+        <div class="matrix-cell" style="background:var(--green-light);"><strong>Relationship Skills</strong></div>
+      </div>
+      <div class="card-expand">Explore skills in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card purple" onclick="openModal('psych_safety')"><span class="card-tag tag-concept">Concept</span><h3>Psychological Safety</h3><p>The shared belief that the team is safe for interpersonal risk-taking. Not comfort — freedom to be candid.</p>
+      <div class="card-expand">Explore concept in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card teal" onclick="openModal('johari')"><span class="card-tag tag-framework">Framework</span><h3>The Johari Window</h3><p>Understanding self-awareness and mutual understanding. Expand the "Open" area through disclosure and feedback.</p>
+      <div class="matrix-2x2">
+        <div class="matrix-cell" style="background:#d4edda;color:var(--green);"><strong>Open</strong></div>
+        <div class="matrix-cell" style="background:var(--blue-light);"><strong>Blind Spot</strong></div>
+        <div class="matrix-cell" style="background:var(--gold-light);"><strong>Hidden</strong></div>
+        <div class="matrix-cell" style="background:var(--warm-dark);"><strong>Unknown</strong></div>
+      </div>
+      <div class="card-expand">Explore framework in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card green" onclick="openModal('trust')"><span class="card-tag tag-practice">Practice</span><h3>Building Trust</h3><p>Trust is built through repeated cycles of reciprocal vulnerability and bid-response.</p>
+      <div class="diagram"><div class="cycle-row"><div class="cycle-step" style="background:var(--green);">Make Bids</div><div class="cycle-arrow">→</div><div class="cycle-step" style="background:var(--teal);">Respond</div><div class="cycle-arrow">→</div><div class="cycle-step" style="background:var(--blue);">Back & Forth</div><div class="cycle-arrow">↻</div></div></div>
+      <div class="card-expand">Explore practice in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card gold" onclick="openModal('disclosure')"><span class="card-tag tag-model">Model</span><h3>The Disclosure Onion & Types</h3><p>Disclosure has layers from surface to authentic self. Three types vary in risk and impact.</p>
+      <div class="card-expand">Explore model in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card blue" onclick="openModal('tgroup')"><span class="card-tag tag-concept">Concept</span><h3>T-Group Design</h3><p>The experiential laboratory: One Task, No Formal Leader, Few Rules. A dialogic process for learning.</p>
+      <div class="card-expand">Explore concept in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+  </div>
+</div>
+
+<!-- WEEK 2 -->
+<div class="section" id="week2">
+  <div class="section-header"><div class="section-week">WEEK<span>2</span></div><div><div class="section-title">Complexities in Communication</div><div class="section-subtitle">Session 2 — The Net Model & Productive Conflict</div></div></div>
+  <div class="cards-row">
+    <div class="card teal" onclick="openModal('netmodel')"><span class="card-tag tag-framework">Framework</span><h3>The Net Model</h3><p>Every interaction has three realities. Miscommunication happens when we confuse intent with impact.</p>
+      <div class="net-model">
+        <div class="net-side" style="background:var(--blue-light);"><strong style="color:var(--blue);">Your Reality</strong><br><span style="font-size:12px;">Intent · Needs · Feelings</span></div>
+        <div class="net-center" style="background:var(--teal-light);color:var(--teal);">Shared Reality<br><span style="font-size:11px;font-weight:400;">Words · Tone · Gestures</span></div>
+        <div class="net-side" style="background:var(--coral-light);"><strong style="color:var(--coral);">My Reality</strong><br><span style="font-size:12px;">Reaction · Judgments</span></div>
+      </div>
+      <div class="card-expand">Explore framework in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card coral" onclick="openModal('conflict')"><span class="card-tag tag-framework">Framework</span><h3>Foundation for Productive Conflict</h3><p>Six building blocks: Care → Curiosity → Context → Compassion → Connection → Creative Conflict.</p>
+      <div class="diagram"><div class="cycle-row"><div class="cycle-step" style="background:var(--coral);">Care</div><div class="cycle-arrow">→</div><div class="cycle-step" style="background:#e67e22;">Curiosity</div><div class="cycle-arrow">→</div><div class="cycle-step" style="background:var(--gold);">Context</div><div class="cycle-arrow">→</div><div class="cycle-step" style="background:var(--green);">Compassion</div><div class="cycle-arrow">→</div><div class="cycle-step" style="background:var(--teal);">Connection</div><div class="cycle-arrow">→</div><div class="cycle-step" style="background:var(--blue);">Creative Conflict</div></div></div>
+      <div class="card-expand">Explore framework in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card green" onclick="openModal('sentence')"><span class="card-tag tag-tool">Tool</span><h3>The Communication Sentence Stem</h3><p>A practical framework for sharing your experience without blame or judgment.</p>
+      <div style="background:var(--green-light);padding:14px;border-radius:var(--radius-sm);margin:12px 0;font-size:13px;line-height:1.8;"><strong>"When you said/did</strong> [behavior]...<br><strong>I thought/felt/assumed</strong> [reaction]...<br><strong>and I would like to ask</strong> [request]..."</div>
+      <div class="card-expand">Explore tool in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+  </div>
+</div>
+
+<!-- WEEK 3 -->
+<div class="section" id="week3">
+  <div class="section-header"><div class="section-week">WEEK<span>3</span></div><div><div class="section-title">Emotional Agility</div><div class="section-subtitle">Session 3 — REAP Model & The Wisdom of Feelings</div></div></div>
+  <div class="cards-row">
+    <div class="card teal" onclick="openModal('reap')"><span class="card-tag tag-framework">Framework</span><h3>The REAP Model</h3><p>A four-step process for working with emotions skillfully, drawing on Susan David's emotional agility.</p>
+      <div class="reap-steps">
+        <div class="reap-step" style="background:var(--teal-light);color:var(--teal);"><span class="letter">R</span>Recognize</div>
+        <div class="reap-step" style="background:var(--blue-light);color:var(--blue);"><span class="letter">E</span>Examine</div>
+        <div class="reap-step" style="background:var(--green-light);color:var(--green);"><span class="letter">A</span>Assess</div>
+        <div class="reap-step" style="background:var(--purple-light);color:var(--purple);"><span class="letter">P</span>Pick</div>
+      </div>
+      <div class="card-expand">Explore framework in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card coral" onclick="openModal('feelings')"><span class="card-tag tag-concept">Concept</span><h3>Feelings vs. Social Feelings vs. Beliefs</h3><p>Not everything we label as a "feeling" actually is one. A critical distinction for emotional literacy.</p>
+      <div class="card-expand">Explore concept in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card green" onclick="openModal('wisdom')"><span class="card-tag tag-concept">Concept</span><h3>The Wisdom of Feelings</h3><p>Emotions carry valuable information: connection, value, insight, triggers, and conflict guidance.</p>
+      <div class="mini-grid">
+        <div class="mini-item" style="background:var(--teal-light);color:var(--teal);"><strong>Connection</strong></div>
+        <div class="mini-item" style="background:var(--blue-light);color:var(--blue);"><strong>Value</strong></div>
+        <div class="mini-item" style="background:var(--green-light);color:var(--green);"><strong>Insight</strong></div>
+        <div class="mini-item" style="background:var(--coral-light);color:var(--coral);"><strong>Triggers</strong></div>
+        <div class="mini-item" style="background:var(--purple-light);color:var(--purple);"><strong>Conflict Guide</strong></div>
+      </div>
+      <div class="card-expand">Explore concept in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+  </div>
+</div>
+
+<!-- WEEK 4 -->
+<div class="section" id="week4">
+  <div class="section-header"><div class="section-week">WEEK<span>4</span></div><div><div class="section-title">Feedback & Emotional Flooding</div><div class="section-subtitle">Session 4 — Feelings-Based Feedback, SCARF Model & Levels of Communication</div></div></div>
+  <div class="cards-row">
+    <div class="card teal" onclick="openModal('scarf')"><span class="card-tag tag-framework">Framework</span><h3>The SCARF Model</h3><p>Five domains of social experience that trigger threat or reward responses in the brain.</p>
+      <div class="scarf-row">
+        <div class="scarf-chip" style="background:var(--teal-light);color:var(--teal);">S — Status</div>
+        <div class="scarf-chip" style="background:var(--blue-light);color:var(--blue);">C — Certainty</div>
+        <div class="scarf-chip" style="background:var(--green-light);color:var(--green);">A — Autonomy</div>
+        <div class="scarf-chip" style="background:var(--coral-light);color:var(--coral);">R — Relatedness</div>
+        <div class="scarf-chip" style="background:var(--purple-light);color:var(--purple);">F — Fairness</div>
+      </div>
+      <div class="card-expand">Explore framework in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card blue" onclick="openModal('levels5')"><span class="card-tag tag-model">Model</span><h3>Five Levels of Communication</h3><p>Communication depth ranges from surface ritual to profound emotional truth.</p>
+      <div class="levels-stack">
+        <div class="level-bar" style="background:var(--warm-dark);"><div class="level-num" style="background:#b0b0b0;">1</div><span><strong>Ritual</strong></span></div>
+        <div class="level-bar" style="background:var(--blue-light);"><div class="level-num" style="background:var(--blue);">2</div><span><strong>Extended Ritual</strong></span></div>
+        <div class="level-bar" style="background:var(--green-light);"><div class="level-num" style="background:var(--green);">3</div><span><strong>Content</strong></span></div>
+        <div class="level-bar" style="background:var(--coral-light);"><div class="level-num" style="background:var(--coral);">4</div><span><strong>Feelings about Content</strong></span></div>
+        <div class="level-bar" style="background:var(--purple-light);"><div class="level-num" style="background:var(--purple);">5</div><span><strong>Feelings about Relationship</strong></span></div>
+      </div>
+      <div class="card-expand">Explore model in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card coral" onclick="openModal('flooding')"><span class="card-tag tag-concept">Concept</span><h3>Mutual Emotional Flooding</h3><p>Based on Gottman's research: when emotions overwhelm clear thinking, productive conversation becomes impossible.</p>
+      <div class="card-expand">Explore concept in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card green" onclick="openModal('feedback')"><span class="card-tag tag-practice">Practice</span><h3>Feelings-Based Feedback</h3><p>The most powerful feedback is "Here & Now" — sharing how someone's behavior affects you in this moment.</p>
+      <div class="card-expand">Explore practice in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+  </div>
+</div>
+
+<!-- WEEK 5 -->
+<div class="section" id="week5">
+  <div class="section-header"><div class="section-week">WEEK<span>5</span></div><div><div class="section-title">Connecting Across Differences</div><div class="section-subtitle">Session 5 — Differential Power, Social Identity & Systems of Inequality</div></div></div>
+  <div class="cards-row">
+    <div class="card purple" onclick="openModal('inequality')"><span class="card-tag tag-framework">Framework</span><h3>System of Inequalities</h3><p>Adapted from Shakti Butler / World Trust: inequality operates at internal, external, and central levels.</p>
+      <div class="card-expand">Explore framework in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card teal" onclick="openModal('crossdiff')"><span class="card-tag tag-skill">Skill Areas</span><h3>Connecting Across Differences</h3><p>The four core skills adapted for cross-difference contexts — from social identity awareness to creating inclusion.</p>
+      <div class="card-expand">Explore skills in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card coral" onclick="openModal('power')"><span class="card-tag tag-concept">Concept</span><h3>Differential Power & Social Identity</h3><p>Power flows through social identity: race, gender, class, sexuality, ability. Understanding stages of identity development.</p>
+      <div class="card-expand">Explore concept in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+  </div>
+</div>
+
+<!-- WEEK 6 -->
+<div class="section" id="week6">
+  <div class="section-header"><div class="section-week">WEEK<span>6</span></div><div><div class="section-title">Interpersonal Influence</div><div class="section-subtitle">Session 6 — Influence as Two-Way, Warmth vs. Competence</div></div></div>
+  <div class="cards-row">
+    <div class="card teal" onclick="openModal('influence')"><span class="card-tag tag-framework">Framework</span><h3>Components of Interpersonal Influence</h3><p>Influence is two-way and not zero-sum. Three pillars: Personal Referent Power, Role Model Norms, Influence Skills.</p>
+      <div class="card-expand">Explore framework in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card coral" onclick="openModal('warmth')"><span class="card-tag tag-model">Model</span><h3>Warmth vs. Competence</h3><p>Amy Cuddy's research: warmth is assessed first and carries more weight. Lead with warmth.</p>
+      <div class="matrix-2x2">
+        <div class="matrix-cell" style="background:var(--coral-light);color:var(--coral);"><strong>High W / Low C</strong></div>
+        <div class="matrix-cell" style="background:#d4edda;color:var(--green);"><strong>High W / High C ✓</strong></div>
+        <div class="matrix-cell" style="background:var(--warm-dark);"><strong>Low W / Low C</strong></div>
+        <div class="matrix-cell" style="background:var(--blue-light);color:var(--blue);"><strong>Low W / High C</strong></div>
+      </div>
+      <div class="card-expand">Explore model in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card green" onclick="openModal('situational')"><span class="card-tag tag-concept">Concept</span><h3>Situational Factors in Influence</h3><p>Timing, relationship history, power dynamics, and group norms all shape how influence works.</p>
+      <div class="card-expand">Explore concept in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+  </div>
+</div>
+
+<!-- WEEKS 7-8 -->
+<div class="section" id="week78">
+  <div class="section-header"><div class="section-week">WEEK<span>7-8</span></div><div><div class="section-title">Weekend Retreat & Honorable Closure</div><div class="section-subtitle">Sessions 7 & 8 — Group Dynamics, Conflict & Repair, Closure</div></div></div>
+  <div class="cards-row">
+    <div class="card purple" onclick="openModal('groupdyn')"><span class="card-tag tag-concept">Concept</span><h3>Group Dynamics & Norms</h3><p>Groups move through stages. Norms keep us stuck or help us grow. Leaders name what's happening.</p>
+      <div class="card-expand">Explore concept in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card teal" onclick="openModal('patterns')"><span class="card-tag tag-tool">Tool</span><h3>Interactional Patterns</h3><p>Common group patterns: Hot Seat, Sustained Pair, Unequal Airtime, By-pass, Sub-groups, Popcorn.</p>
+      <div class="mini-grid" style="grid-template-columns:repeat(auto-fit,minmax(100px,1fr));">
+        <div class="mini-item" style="background:var(--coral-light);color:var(--coral);"><strong>Hot Seat</strong></div>
+        <div class="mini-item" style="background:var(--blue-light);color:var(--blue);"><strong>Sustained Pair</strong></div>
+        <div class="mini-item" style="background:var(--purple-light);color:var(--purple);"><strong>Unequal Air</strong></div>
+        <div class="mini-item" style="background:var(--teal-light);color:var(--teal);"><strong>By-pass</strong></div>
+        <div class="mini-item" style="background:var(--green-light);color:var(--green);"><strong>Sub-groups</strong></div>
+        <div class="mini-item" style="background:var(--gold-light);color:var(--gold);"><strong>Popcorn</strong></div>
+      </div>
+      <div class="card-expand">Explore patterns in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+
+    <div class="card gold" onclick="openModal('closure')"><span class="card-tag tag-practice">Practice</span><h3>Honorable Closure</h3><p>Ending with intention: What's unfinished? Accept it or raise it? Reflect at intrapersonal, interpersonal, and group levels.</p>
+      <div class="card-expand">Explore practice in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+  </div>
+</div>
+
+<!-- WEEK 9 -->
+<div class="section" id="week9">
+  <div class="section-header"><div class="section-week">WEEK<span>9</span></div><div><div class="section-title">Applying Learnings</div><div class="section-subtitle">Session 9 — Last Lecture & Moving Forward</div></div></div>
+  <div class="cards-row" style="grid-template-columns:1fr;">
+    <div class="card teal" onclick="openModal('integration')" style="max-width:100%;"><span class="card-tag tag-framework">Integration</span><h3>From T-Group to Real Life</h3>
+      <p>The final session brings together all learnings into a portable skillset. Click to explore how each tenet translates to everyday life.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:16px 0;">
+        <div style="padding:10px;background:var(--teal-light);border-radius:8px;text-align:center;font-size:12px;font-weight:600;color:var(--teal);">Reflection → Awareness</div>
+        <div style="padding:10px;background:var(--blue-light);border-radius:8px;text-align:center;font-size:12px;font-weight:600;color:var(--blue);">Self-Regulation → Agency</div>
+        <div style="padding:10px;background:var(--green-light);border-radius:8px;text-align:center;font-size:12px;font-weight:600;color:var(--green);">Disclosure → Connection</div>
+        <div style="padding:10px;background:var(--coral-light);border-radius:8px;text-align:center;font-size:12px;font-weight:600;color:var(--coral);">Vulnerability → Depth</div>
+        <div style="padding:10px;background:var(--purple-light);border-radius:8px;text-align:center;font-size:12px;font-weight:600;color:var(--purple);">Care + Inquiry → Trust</div>
+        <div style="padding:10px;background:var(--gold-light);border-radius:8px;text-align:center;font-size:12px;font-weight:600;color:var(--gold);">Tough Care → Strength</div>
+      </div>
+      <div class="quote-block">"I want to love you without clutching, appreciate you without judging, join you without invading, invite you without demanding, leave you without guilt, criticize you without blaming, and help you without insulting. If I can have the same from you, then we can truly meet and enrich each other."<div class="quote-author">— Virginia Satir</div></div>
+      <div class="card-expand">Explore integration in detail <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+<div class="footer">OB 374 Interpersonal Dynamics · Stanford Graduate School of Business · Fall 2023 · Leslie Chin<br>Interactive dashboard — click any card to explore deeper</div>
+
+<!-- ============ MODAL OVERLAY ============ -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+<div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// ===== MODAL DATA =====
+const MODALS = {
+
+// ---- TENETS ----
+tenet1: {
+  tag:'Core Tenet', tagClass:'tag-framework', title:'Reflection Expands Awareness', week:'Course Tenet #1',
+  tabs: {
+    'Overview': `<p>Reflection is the foundational practice of the entire course. Without pausing to notice what's happening — in yourself, in others, in the group — learning from experience is impossible. This tenet underpins the Experiential Learning Cycle: the "Reflect & Refine" step is where real insight emerges.</p>
+    <p><strong>Self-reflection</strong> means noticing your own thoughts, feelings, assumptions, and patterns — often in real time. <strong>Other-reflection</strong> means observing and making sense of others' behaviors, reactions, and patterns.</p>
+    <p>The course uses several tools to develop reflective capacity: journals require structured reflection after each T-group session, the Johari Window provides a framework for understanding what you know and don't know about yourself, and the T-group itself is a live laboratory where reflection happens in the moment.</p>`,
+    'In Practice': `<h4>Four Reflection Questions (from Journal Guidelines)</h4>
+    <p>After each T-group session, students reflect on:</p>
+    <ul><li><strong>What happened?</strong> — Describe a specific moment or interaction</li>
+    <li><strong>What did I feel?</strong> — Name the emotions that came up (using feelings literacy)</li>
+    <li><strong>What does it mean?</strong> — What does this reveal about my patterns, values, or blind spots?</li>
+    <li><strong>What will I do differently?</strong> — How does this inform my next action or goal?</li></ul>
+    <div class="example-box"><div class="label">Example</div><p style="font-size:13px;margin:0;">Instead of: "The group had a good discussion today."<br>Try: "When Sam shared his frustration with me, I noticed I immediately wanted to defend myself. My chest tightened and I felt embarrassed. This tells me I have a pattern of interpreting feedback as personal criticism rather than useful data. Next time, I want to practice staying curious for at least 30 seconds before responding."</p></div>`,
+    'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div>
+    <ul style="margin:8px 0 0;"><li>What patterns do you notice in your interactions that you weren't aware of before?</li>
+    <li>When do you find it hardest to be reflective? What gets in the way?</li>
+    <li>How might regular reflection practice change your relationships outside this course?</li>
+    <li>What's one thing others seem to see about you that you struggle to see yourself?</li></ul></div>
+    <p><strong>Related Frameworks:</strong></p>
+    <div class="related-chips"><span class="related-chip" onclick="openModal('elc')">Experiential Learning Cycle</span><span class="related-chip" onclick="openModal('johari')">Johari Window</span><span class="related-chip" onclick="openModal('reap')">REAP Model</span></div>`
+  }
+},
+
+tenet2: {
+  tag:'Core Tenet', tagClass:'tag-framework', title:'Self-Regulation Increases Agency', week:'Course Tenet #2',
+  tabs: {
+    'Overview': `<p>Self-regulation is the ability to manage your emotional responses rather than being controlled by them. It doesn't mean suppressing emotions — it means creating enough space between stimulus and response to choose how you act.</p>
+    <p>When you can regulate yourself, you have <strong>agency</strong> — the power to choose your response rather than defaulting to automatic patterns. This is the difference between reacting and responding.</p>
+    <p>Key tools: the <strong>REAP Model</strong> (Recognize, Examine, Assess, Pick), understanding <strong>emotional flooding</strong> and how to manage it, and recognizing <strong>SCARF triggers</strong> that hijack your brain's threat system.</p>`,
+    'In Practice': `<h4>Signs You Need to Self-Regulate</h4>
+    <ul><li>Your heart rate increases and breathing becomes shallow</li>
+    <li>You feel the urge to defend, attack, or withdraw</li>
+    <li>You're making assumptions about others' intentions</li>
+    <li>You can't listen — you're formulating your response while others talk</li>
+    <li>Your inner critic or judge is very loud</li></ul>
+    <h4>Techniques</h4>
+    <ul><li><strong>Pause:</strong> Take a breath before responding. Even 3 seconds creates space.</li>
+    <li><strong>Name it:</strong> "I notice I'm feeling defensive right now." Naming reduces the emotion's grip.</li>
+    <li><strong>Ground:</strong> Feel your feet on the floor. Notice the temperature of the room.</li>
+    <li><strong>Ask:</strong> "What am I assuming right now that I could check?"</li></ul>
+    <div class="example-box"><div class="label">Example</div><p style="font-size:13px;margin:0;">Someone gives you feedback that stings. Instead of saying "That's not fair" (reaction), you pause and say: "I notice I'm having a strong reaction to that. Let me sit with it for a moment." Then you use REAP: Recognize (I feel defensive), Examine (this touches on my fear of not being good enough), Assess (I could defend, deflect, or get curious), Pick (I'll ask them to tell me more).</p></div>`,
+    'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div>
+    <ul style="margin:8px 0 0;"><li>What are your default reactions when you feel threatened? (Fight, flight, freeze, appease?)</li>
+    <li>In what situations do you most lose your ability to choose your response?</li>
+    <li>What would change in your most important relationships if you could reliably create a 5-second pause before responding?</li></ul></div>
+    <p><strong>Related Frameworks:</strong></p>
+    <div class="related-chips"><span class="related-chip" onclick="openModal('reap')">REAP Model</span><span class="related-chip" onclick="openModal('flooding')">Emotional Flooding</span><span class="related-chip" onclick="openModal('scarf')">SCARF Model</span></div>`
+  }
+},
+
+tenet3: {
+  tag:'Core Tenet', tagClass:'tag-framework', title:'Self-Disclosure Hooks Connection', week:'Course Tenet #3',
+  tabs: {
+    'Overview': `<p>Self-disclosure — sharing something real about yourself — is the primary mechanism for building connection. When you reveal something authentic, you create a "hook" that invites others to engage with you at a deeper level.</p>
+    <p>The Johari Window shows this visually: disclosure moves information from your "Hidden" area to the "Open" area, expanding the space of shared understanding. The Disclosure Onion model shows that disclosure has layers — from surface preferences to core identity — and deeper layers create stronger connection (and involve more risk).</p>
+    <p>Three types of disclosure, ranked by impact: <strong>Then & Here</strong> (past experience, lower risk), <strong>There & Now</strong> (current feelings about external topics, moderate), and <strong>Here & Now</strong> (what you feel right now in this room, highest impact and risk).</p>`,
+    'In Practice': `<h4>The Disclosure Spectrum</h4>
+    <div class="detail-box" style="background:var(--warm);">
+    <p style="margin:0 0 8px;font-size:13px;"><strong>Surface:</strong> "I'm from Chicago." / "I work in tech." — Safe, factual, low connection.</p>
+    <p style="margin:0 0 8px;font-size:13px;"><strong>Middle:</strong> "I struggle with being a perfectionist." / "I grew up feeling like the outsider." — Moderate risk, builds understanding.</p>
+    <p style="margin:0 0 8px;font-size:13px;"><strong>Deep:</strong> "Right now I feel scared that if I share this, you'll think less of me." — High risk, creates powerful connection.</p>
+    </div>
+    <h4>Disclosures with "Hooks"</h4>
+    <p>A "hook" is the emotional or vulnerable element that invites engagement. Without hooks, disclosures remain informational. With hooks, they become invitations to connect.</p>
+    <div class="example-box"><div class="label">Without Hook</div><p style="font-size:13px;margin:0;">"I changed careers three years ago." (Fact — hard to engage with)</p></div>
+    <div class="example-box"><div class="label">With Hook</div><p style="font-size:13px;margin:0;">"I changed careers three years ago and I still wonder if I made the right choice. Sometimes I feel like I'm behind everyone else." (Vulnerable — others can relate and respond)</p></div>`,
+    'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div>
+    <ul style="margin:8px 0 0;"><li>What's one thing about yourself that, if shared, might deepen a relationship you care about?</li>
+    <li>What holds you back from disclosing more? What's the feared consequence?</li>
+    <li>Think of a time someone disclosed something vulnerable to you. How did it change your perception of them?</li></ul></div>
+    <p><strong>Related Frameworks:</strong></p>
+    <div class="related-chips"><span class="related-chip" onclick="openModal('johari')">Johari Window</span><span class="related-chip" onclick="openModal('disclosure')">Disclosure Onion</span><span class="related-chip" onclick="openModal('trust')">Building Trust</span><span class="related-chip" onclick="openModal('levels5')">5 Levels of Communication</span></div>`
+  }
+},
+
+tenet4: {
+  tag:'Core Tenet', tagClass:'tag-framework', title:'Vulnerability Deepens Connection', week:'Course Tenet #4',
+  tabs: {
+    'Overview': `<p>Vulnerability — the willingness to be seen as imperfect, uncertain, or emotionally exposed — is not weakness. It's the fastest path to genuine human connection. When you allow yourself to be vulnerable, you signal trust and invite reciprocal openness.</p>
+    <p>In the T-group context, vulnerability means sharing feelings you'd normally keep hidden, admitting when you don't know something, acknowledging mistakes, and expressing needs. It operates in the 15% zone — you don't need to share everything, just enough to stretch beyond your comfort zone.</p>
+    <p>The course shows that vulnerability is actually a form of <strong>strength and courage</strong>. It takes more courage to say "I'm scared" than to project confidence you don't feel.</p>`,
+    'In Practice': `<h4>Forms of Vulnerability in Practice</h4>
+    <ul><li><strong>Emotional:</strong> "I feel anxious right now." / "That hurt my feelings."</li>
+    <li><strong>Intellectual:</strong> "I don't understand." / "I was wrong about that."</li>
+    <li><strong>Relational:</strong> "I care about what you think of me." / "I want to be closer to you and I'm not sure how."</li>
+    <li><strong>Identity:</strong> Sharing parts of who you are that feel risky — background, struggles, values.</li></ul>
+    <h4>The Vulnerability Paradox</h4>
+    <p>We tend to see vulnerability in others as courage and vulnerability in ourselves as weakness. The course helps you recalibrate this — to see your own vulnerability as the brave act that it is.</p>
+    <div class="exercise-box"><div class="label">Exercise</div><p style="font-size:13px;margin:0;">Think of a relationship where you feel stuck at a surface level. What's one vulnerable truth you could share that might deepen it? Practice saying it out loud, noticing what feelings come up as you do.</p></div>`,
+    'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div>
+    <ul style="margin:8px 0 0;"><li>When was the last time you were truly vulnerable with someone? What happened?</li>
+    <li>What's your relationship with vulnerability? Do you see it as strength or weakness?</li>
+    <li>What would you risk sharing if you knew you wouldn't be judged?</li></ul></div>
+    <p><strong>Related Frameworks:</strong></p>
+    <div class="related-chips"><span class="related-chip" onclick="openModal('trust')">Building Trust</span><span class="related-chip" onclick="openModal('zone15')">15% Zone</span><span class="related-chip" onclick="openModal('disclosure')">Disclosure Onion</span></div>`
+  }
+},
+
+tenet5: {
+  tag:'Core Tenet', tagClass:'tag-framework', title:'Care & Inquiry Build Trust', week:'Course Tenet #5',
+  tabs: {
+    'Overview': `<p>When someone shares something vulnerable, how you respond determines whether trust grows or erodes. The course teaches that the combination of genuine <strong>care</strong> (warmth, concern for the other) and <strong>inquiry</strong> (curiosity, asking questions) is the most powerful trust-building response.</p>
+    <p>Care without inquiry can feel smothering or patronizing. Inquiry without care can feel like interrogation. Together, they communicate: "I see you, I'm interested in you, and I'm not going to judge you."</p>
+    <p>This connects to the Foundation for Productive Conflict (Care → Curiosity) and to Amy Cuddy's finding that warmth is assessed before competence.</p>`,
+    'In Practice': `<h4>Responding with Care & Inquiry</h4>
+    <div class="detail-box" style="background:var(--warm);">
+    <p style="margin:0 0 8px;font-size:13px;"><strong>Poor response (dismissive):</strong> "Don't worry about it, you'll be fine."</p>
+    <p style="margin:0 0 8px;font-size:13px;"><strong>Poor response (advice-giving):</strong> "Here's what you should do..."</p>
+    <p style="margin:0 0 8px;font-size:13px;"><strong>Poor response (one-upping):</strong> "Oh yeah, that happened to me too, let me tell you..."</p>
+    <p style="margin:0;font-size:13px;"><strong>Good response (care + inquiry):</strong> "Thank you for sharing that. What was that like for you? What's coming up as you talk about it?"</p>
+    </div>
+    <h4>The Bid-Response Cycle</h4>
+    <p>Every disclosure is a "bid" for connection. You can respond by:</p>
+    <ul><li><strong>Turning toward:</strong> Engaging with curiosity and warmth (builds trust)</li>
+    <li><strong>Turning away:</strong> Ignoring or changing the subject (erodes trust)</li>
+    <li><strong>Turning against:</strong> Criticizing or dismissing (destroys trust)</li></ul>`,
+    'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div>
+    <ul style="margin:8px 0 0;"><li>What's your default response when someone shares something vulnerable? Do you advise, fix, relate, or get curious?</li>
+    <li>Think of someone who makes you feel truly heard. What do they do?</li>
+    <li>How often do you ask follow-up questions versus jumping to share your own experience?</li></ul></div>
+    <p><strong>Related Frameworks:</strong></p>
+    <div class="related-chips"><span class="related-chip" onclick="openModal('trust')">Building Trust</span><span class="related-chip" onclick="openModal('conflict')">Productive Conflict</span><span class="related-chip" onclick="openModal('warmth')">Warmth vs. Competence</span></div>`
+  }
+},
+
+tenet6: {
+  tag:'Core Tenet', tagClass:'tag-framework', title:'Tough Care Strengthens Relationships', week:'Course Tenet #6',
+  tabs: {
+    'Overview': `<p>The most counterintuitive tenet: challenging someone — giving hard feedback, naming difficult truths, pushing back — can actually <strong>strengthen</strong> a relationship rather than weaken it. But only when done with genuine care.</p>
+    <p>"Tough care" means caring enough about someone to risk their temporary discomfort for their long-term growth. It's the opposite of "nice" — which often means avoiding hard conversations to protect your own comfort.</p>
+    <p>This connects to Level 5 communication (feelings about the relationship), feelings-based feedback, and the SCARF model (knowing how to deliver tough messages without unnecessarily triggering threat responses).</p>`,
+    'In Practice': `<h4>Tough Care vs. Being Mean vs. Being Nice</h4>
+    <div class="detail-box" style="background:var(--warm);">
+    <p style="margin:0 0 8px;font-size:13px;"><strong>Being Nice (avoidance):</strong> "Everything's fine!" when it's not. Protects your comfort, not the relationship.</p>
+    <p style="margin:0 0 8px;font-size:13px;"><strong>Being Mean (attack):</strong> "You always do this and it's really annoying." Releases frustration, damages trust.</p>
+    <p style="margin:0;font-size:13px;"><strong>Tough Care:</strong> "I care about you and this relationship, so I want to share something that's been on my mind. When you [behavior], I feel [feeling], and I think it's affecting [impact]. Can we talk about it?"</p>
+    </div>
+    <h4>Prerequisites for Tough Care</h4>
+    <ul><li>The relationship has a foundation of trust and psychological safety</li>
+    <li>Your intention is genuinely for the other person's benefit, not to vent</li>
+    <li>You've done your own REAP processing first</li>
+    <li>You're prepared to listen to their response with curiosity</li></ul>
+    <div class="exercise-box"><div class="label">Exercise</div><p style="font-size:13px;margin:0;">Identify one relationship where you've been "nice" instead of honest. What's the hard truth you've been avoiding? Draft how you might express it using the sentence stem: "Because I care about [relationship], I want to share that when you [behavior], I feel [feeling]."</p></div>`,
+    'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div>
+    <ul style="margin:8px 0 0;"><li>Where in your life are you choosing "nice" over honest? What's the cost?</li>
+    <li>When has someone's tough care helped you grow? What made it effective?</li>
+    <li>What's your biggest fear about giving hard feedback?</li></ul></div>
+    <p><strong>Related Frameworks:</strong></p>
+    <div class="related-chips"><span class="related-chip" onclick="openModal('feedback')">Feelings-Based Feedback</span><span class="related-chip" onclick="openModal('scarf')">SCARF Model</span><span class="related-chip" onclick="openModal('levels5')">5 Levels of Communication</span><span class="related-chip" onclick="openModal('sentence')">Sentence Stem</span></div>`
+  }
+},
+
+// ---- WEEK 1 MODALS ----
+elc: {
+  tag:'Framework', tagClass:'tag-framework', title:'Experiential Learning Cycle', week:'Week 1 · Session 1a',
+  tabs: {
+    'Overview': `<p>The Experiential Learning Cycle is the engine that powers all learning in OB 374. It's based on the insight that interpersonal skills cannot be learned from books alone — they must be practiced, observed, and refined through real experience.</p>
+    <p>The cycle has three phases that repeat continuously:</p>
+    <div class="detail-box" style="background:var(--teal-light);">
+    <p style="margin:0 0 10px;"><strong style="color:var(--teal);">1. Goals & Action</strong> — Set a specific, personal learning goal and take action. Try a new behavior in the T-group. The goal should be in your 15% zone — challenging but not overwhelming.</p>
+    <p style="margin:0 0 10px;"><strong style="color:var(--blue);">2. Collect Data</strong> — Observe what happens. How did others respond? What did you feel? What did you notice about the group dynamic? Data comes from your own internal experience and from feedback others give you.</p>
+    <p style="margin:0;"><strong style="color:var(--green);">3. Reflect & Refine</strong> — Make meaning from the data. What worked? What surprised you? What would you do differently? Then set a new or refined goal, and the cycle begins again.</p>
+    </div>
+    <p>The cycle is intentionally iterative. You're not expected to get it right the first time. Each pass through the cycle deepens your understanding and refines your skills.</p>`,
+    'Deep Dive': `<h4>Why Experiential Learning Works</h4>
+    <p>Traditional learning is "outside-in": someone tells you a concept and you try to apply it. Experiential learning is "inside-out": you have an experience, reflect on it, and extract your own principles.</p>
+    <p>For interpersonal skills, this matters because:</p>
+    <ul><li><strong>Knowing ≠ Doing:</strong> You can understand active listening intellectually but still struggle to do it when emotions are high</li>
+    <li><strong>Context matters:</strong> What works in one relationship may not work in another. You need to develop judgment, not just techniques</li>
+    <li><strong>Blind spots are invisible:</strong> You can't learn about your blind spots from a textbook — you need real feedback from real interactions</li>
+    <li><strong>Habits are stubborn:</strong> Changing interpersonal patterns requires repeated practice with feedback, not one-time insights</li></ul>
+    <h4>The Role of the T-Group</h4>
+    <p>The T-group is the laboratory where the cycle happens. It provides a rare combination: authentic interactions (not role-plays) in a context where reflection and feedback are expected and welcomed. This makes it safe to experiment and fail — which is essential for learning.</p>
+    <div class="example-box"><div class="label">Example Cycle</div>
+    <p style="font-size:13px;margin:0;"><strong>Goal:</strong> "I want to practice sharing my feelings in the moment instead of waiting until they pass."<br>
+    <strong>Action:</strong> During T-group, you notice feeling irritated when someone keeps interrupting. You say: "I'm noticing I feel frustrated right now because I keep getting cut off."<br>
+    <strong>Data:</strong> The interrupter looks surprised, then apologetic. Another group member says "I felt the same way." You feel relieved but also a bit shaky.<br>
+    <strong>Reflect:</strong> "It was harder than I expected, but the response was positive. I tend to assume people will react badly, but they were receptive. Next time I want to share even sooner, before the frustration builds."</p></div>`,
+    'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div>
+    <ul style="margin:8px 0 0;"><li>Which phase of the cycle is hardest for you? (Setting goals, collecting data, or reflecting?)</li>
+    <li>How do you typically learn best — through doing, observing, or analyzing?</li>
+    <li>What's one interpersonal skill you've wanted to develop but haven't practiced deliberately?</li></ul></div>
+    <p><strong>Related Frameworks:</strong></p>
+    <div class="related-chips"><span class="related-chip" onclick="openModal('zone15')">15% Zone</span><span class="related-chip" onclick="openModal('competence')">Competence Matrix</span><span class="related-chip" onclick="openModal('tgroup')">T-Group Design</span><span class="related-chip" onclick="openModal('tenet1')">Tenet: Reflection</span></div>`
+  }
+},
+
+zone15: {
+  tag:'Concept', tagClass:'tag-concept', title:'The 15% Zone of Learning', week:'Week 1 · Session 1a',
+  tabs: {
+    'Overview': `<p>The 15% concept addresses a fundamental challenge: how much risk should you take in order to learn? The answer is: just enough to feel uncomfortable, but not so much that you shut down.</p>
+    <p>Three zones:</p>
+    <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">Comfort Zone (0-10%)</strong> — Familiar patterns. You feel safe but you're not learning. This is where most professional interactions stay. It's pleasant but stagnant.</p></div>
+    <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">Learning Zone (10-20%, the "15%")</strong> — You feel a stretch. Heart rate slightly elevated. Some anxiety, but you can still think clearly. This is where growth happens. You're alert, present, and engaged.</p></div>
+    <div class="detail-box" style="background:#f8d7da;"><p style="margin:0;"><strong style="color:#c0392b;">Danger Zone (20%+)</strong> — Fight/flight/freeze activated. You can't think clearly. Emotional flooding. You might say or do things you regret. No learning happens here — just survival.</p></div>
+    <p>Importantly, everyone's 15% is different. What feels like a small risk for one person (speaking up in a group) might be a 30% risk for someone else. Calibrating your own 15% is part of the learning.</p>`,
+    'In Practice': `<h4>How to Find Your 15%</h4>
+    <ul><li><strong>Notice your body:</strong> Slight nervousness, butterflies, a catch in your breath — that's 15%. Sweating, racing heart, tunnel vision — that's too much.</li>
+    <li><strong>Check your thinking:</strong> "This feels risky but I can handle it" = 15%. "I might die" = danger zone.</li>
+    <li><strong>Start small:</strong> You can always increase risk. You can't un-ring a bell. Begin at 10% and calibrate upward.</li></ul>
+    <h4>Examples of 15% Risks by Personality Type</h4>
+    <div class="detail-box" style="background:var(--warm);">
+    <p style="margin:0 0 8px;font-size:13px;"><strong>If you tend to be quiet:</strong> 15% might be speaking up without being asked, or sharing a feeling before it fully forms.</p>
+    <p style="margin:0 0 8px;font-size:13px;"><strong>If you tend to dominate:</strong> 15% might be staying silent for a full 10 minutes, or asking a question instead of sharing an opinion.</p>
+    <p style="margin:0 0 8px;font-size:13px;"><strong>If you tend to be intellectual:</strong> 15% might be naming an emotion you're feeling right now, without analyzing it.</p>
+    <p style="margin:0;font-size:13px;"><strong>If you tend to be emotional:</strong> 15% might be pausing before reacting, or asking someone what they meant before assuming.</p></div>`,
+    'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div>
+    <ul style="margin:8px 0 0;"><li>What does your comfort zone look like in interpersonal interactions? What patterns keep you there?</li>
+    <li>When was the last time you were in your 15% zone? What did you learn?</li>
+    <li>What would a 15% risk look like for you this week in a real relationship?</li></ul></div>
+    <p><strong>Related Frameworks:</strong></p>
+    <div class="related-chips"><span class="related-chip" onclick="openModal('elc')">Experiential Learning Cycle</span><span class="related-chip" onclick="openModal('psych_safety')">Psychological Safety</span><span class="related-chip" onclick="openModal('tenet4')">Tenet: Vulnerability</span></div>`
+  }
+},
+
+johari: {
+  tag:'Framework', tagClass:'tag-framework', title:'The Johari Window', week:'Week 1 · Session 1b',
+  tabs: {
+    'Overview': `<p>Created by Joseph Luft and Harrington Ingham, the Johari Window maps self-awareness across two dimensions: what is known/unknown to you, and what is known/unknown to others. This creates four quadrants:</p>
+    <div class="detail-box" style="background:#d4edda;"><p style="margin:0;"><strong style="color:var(--green);">Open (Known to self, Known to others)</strong> — The shared, public self. The larger this area, the more authentic and trusting the relationship. This is where genuine communication happens.</p></div>
+    <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Blind Spot (Unknown to self, Known to others)</strong> — Things others see about you that you can't see yourself. Your mannerisms, impact on others, patterns you don't notice. Reduced through <strong>feedback</strong>.</p></div>
+    <div class="detail-box" style="background:var(--gold-light);"><p style="margin:0;"><strong style="color:var(--gold);">Hidden / Façade (Known to self, Unknown to others)</strong> — Things you know about yourself but keep hidden. Secrets, fears, desires, opinions you don't share. Reduced through <strong>disclosure</strong>.</p></div>
+    <div class="detail-box" style="background:var(--warm-dark);"><p style="margin:0;"><strong>Unknown (Unknown to both)</strong> — Unconscious patterns, latent potential, undiscovered aspects of self. Sometimes revealed through deep interaction, therapy, or crisis.</p></div>
+    <p>The goal is to <strong>expand the Open area</strong> by courageously disclosing (shrinking Hidden) and gratefully receiving feedback (shrinking Blind Spots).</p>`,
+    'Deep Dive': `<h4>Why the Open Area Matters</h4>
+    <p>When the Open area is small, interactions are guarded and superficial. People are managing impressions rather than connecting. Energy goes into maintaining the façade rather than building the relationship.</p>
+    <p>When the Open area is large, interactions are authentic and efficient. There's less guesswork, fewer misunderstandings, and more genuine connection. Paradoxically, people respect you <em>more</em> when you're transparent about your limitations, not less.</p>
+    <h4>The Johari Window in Teams</h4>
+    <p>Teams also have collective Johari Windows. High-performing teams have large Open areas — members know each other's strengths, weaknesses, communication preferences, and triggers. This reduces friction and increases trust.</p>
+    <h4>Session 4 Redux: Feedback & the Johari Window</h4>
+    <p>In Session 4, the Johari Window is revisited with a focus on feedback as the tool for reducing blind spots. The course emphasizes that feedback is a <strong>gift</strong> — it gives you information you literally cannot get any other way.</p>
+    <div class="example-box"><div class="label">Common Blind Spots in Leaders</div><p style="font-size:13px;margin:0;">Impact of your tone when stressed · How much airtime you take · The effect of your facial expressions · Whether people feel safe disagreeing with you · How your attempts at humor land</p></div>`,
+    'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div>
+    <ul style="margin:8px 0 0;"><li>In your most important relationship, how large is the "Open" area? What's in your "Hidden" zone?</li>
+    <li>What feedback have you received that surprised you? What blind spot did it reveal?</li>
+    <li>What would it take for you to actively seek feedback from three people this week?</li></ul></div>
+    <p><strong>Related Frameworks:</strong></p>
+    <div class="related-chips"><span class="related-chip" onclick="openModal('disclosure')">Disclosure Onion</span><span class="related-chip" onclick="openModal('feedback')">Feelings-Based Feedback</span><span class="related-chip" onclick="openModal('trust')">Building Trust</span><span class="related-chip" onclick="openModal('tenet3')">Tenet: Self-Disclosure</span></div>`
+  }
+},
+
+psych_safety: {
+  tag:'Concept', tagClass:'tag-concept', title:'Psychological Safety', week:'Week 1 · Session 1b',
+  tabs: {
+    'Overview': `<p>Drawn from Amy Edmondson's research at Harvard, psychological safety is the shared belief that the group is safe for interpersonal risk-taking. It doesn't mean everyone is comfortable all the time — it means the environment supports honesty, vulnerability, and learning from mistakes.</p>
+    <p>In OB 374, psychological safety is both the goal and the method. The T-group creates conditions for safety, and participants practice creating safety for each other. Four elements contribute to a safe learning environment:</p>
+    <ul><li><strong>Support yourself</strong> — 15% risk is the goal, not maximum risk. Know your limits.</li>
+    <li><strong>Support confidentiality</strong> — What happens in T-group stays in T-group. This is essential.</li>
+    <li><strong>Understand confidentiality limits</strong> — Teaching team roles have specific confidentiality boundaries (noted in syllabus).</li>
+    <li><strong>Mind due process limitations</strong> — Conversations about illegal behavior or university policy violations create witnesses.</li></ul>`,
+    'In Practice': `<h4>Creating Safety for Others</h4>
+    <ul><li><strong>Respond to bids:</strong> When someone takes a risk, acknowledge it. Don't let vulnerability hang in silence.</li>
+    <li><strong>Normalize imperfection:</strong> Share your own struggles. When leaders show vulnerability, it gives permission to others.</li>
+    <li><strong>Separate intent from impact:</strong> When someone's words land poorly, get curious about their intent before judging.</li>
+    <li><strong>Protect the space:</strong> If someone is being shamed or pressured beyond their limits, intervene.</li></ul>
+    <h4>Safety vs. Comfort</h4>
+    <p>A crucial distinction: psychological safety does NOT mean everyone feels comfortable. Growth requires discomfort. Safety means you won't be punished or humiliated for taking interpersonal risks, not that the risks won't feel scary.</p>
+    <div class="example-box"><div class="label">Example</div><p style="font-size:13px;margin:0;">A psychologically safe T-group might have intense conflict, tears, and uncomfortable silences. What makes it <em>safe</em> is that everyone knows they can be honest, mistakes will be met with curiosity rather than judgment, and confidentiality is maintained.</p></div>`,
+    'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div>
+    <ul style="margin:8px 0 0;"><li>In which of your relationships or teams do you feel psychologically safe? What makes it safe?</li>
+    <li>Where do you NOT feel safe? What's missing?</li>
+    <li>What's one thing you could do to increase safety for someone else?</li></ul></div>
+    <p><strong>Related Frameworks:</strong></p>
+    <div class="related-chips"><span class="related-chip" onclick="openModal('zone15')">15% Zone</span><span class="related-chip" onclick="openModal('trust')">Building Trust</span><span class="related-chip" onclick="openModal('tgroup')">T-Group Design</span></div>`
+  }
+},
+
+competence: { tag:'Model', tagClass:'tag-model', title:'Conscious/Unconscious × Skilled/Unskilled', week:'Week 1 · Session 1a',
+  tabs: { 'Overview': `<p>This 2×2 matrix maps the learning journey for any skill. It shows that awareness precedes competence — you must first <em>see</em> what you don't know before you can improve.</p>
+  <div class="detail-box" style="background:#fdf0ee;"><p style="margin:0;"><strong style="color:var(--coral);">Unconscious Unskilled</strong> — You don't know what you don't know. Blind spots. You may think you're a great listener while people experience you as dismissive. This is the starting point for many interpersonal skills.</p></div>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">Conscious Unskilled</strong> — You now see the gap. Feedback or reflection revealed a blind spot. This stage can feel uncomfortable ("I had no idea I was doing that!"), but awareness is the essential first step.</p></div>
+  <div class="detail-box" style="background:#d4edda;"><p style="margin:0;"><strong style="color:var(--green);">Conscious Skilled</strong> — You can do it, but it requires deliberate effort. Like learning to drive — you're competent but it's not yet automatic. You might use the sentence stem consciously, or deliberately pause before responding.</p></div>
+  <div class="detail-box" style="background:var(--purple-light);"><p style="margin:0;"><strong style="color:var(--purple);">Unconscious Skilled</strong> — Mastery. The skill is second nature. You naturally attune to others' emotions, give feedback skillfully, and navigate conflict without needing a framework to guide you.</p></div>
+  <p>The course primarily moves you from Unconscious Unskilled → Conscious Unskilled (through feedback and reflection) and from Conscious Unskilled → Conscious Skilled (through practice in T-groups).</p>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>For the interpersonal skill you most want to develop, which quadrant are you in?</li><li>What feedback have you received that moved you from Unconscious Unskilled to Conscious Unskilled?</li><li>What skills are you Conscious Skilled at that you wish were more automatic?</li></ul></div>
+  <p><strong>Related:</strong></p><div class="related-chips"><span class="related-chip" onclick="openModal('elc')">Experiential Learning Cycle</span><span class="related-chip" onclick="openModal('johari')">Johari Window</span></div>` }
+},
+
+skills4: { tag:'Skill Areas', tagClass:'tag-skill', title:'Four Core Skill Domains', week:'Week 1 · Session 1a',
+  tabs: { 'Overview': `<p>The course develops interpersonal effectiveness across four interconnected domains that map to a 2×2: Self vs. Others × Awareness vs. Action.</p>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">Self-Awareness</strong> — Knowing your own patterns, triggers, emotions, values, strengths, and blind spots. The foundation for everything else. Tools: reflection journals, Johari Window, feedback. Key question: "What am I feeling right now and why?"</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Social Awareness</strong> — Reading others. Empathy, attunement, understanding others' perspectives and emotional states. Tools: active listening, observing body language, checking assumptions. Key question: "What might they be experiencing right now?"</p></div>
+  <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">Self-Management</strong> — Regulating your emotions and choosing your responses. Not suppression — skillful choice. Tools: REAP model, recognizing flooding, managing SCARF triggers. Key question: "What response would best serve this relationship right now?"</p></div>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">Relationship Skills</strong> — Building, maintaining, and repairing connections. Communication, influence, feedback, conflict navigation. Tools: Net Model, sentence stem, 5 Levels of Communication. Key question: "What does this relationship need from me right now?"</p></div>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Self-Assessment</div><p style="font-size:13px;">Rate yourself 1-10 on each domain. Which is your strongest? Which needs the most development? What's one specific action you could take this week to strengthen your weakest area?</p></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('reap')">REAP (Self-Management)</span><span class="related-chip" onclick="openModal('netmodel')">Net Model (Relationship)</span><span class="related-chip" onclick="openModal('crossdiff')">Skills Across Differences</span></div>` }
+},
+
+trust: { tag:'Practice', tagClass:'tag-practice', title:'Building Trust', week:'Week 1 · Session 1b',
+  tabs: { 'Overview': `<p>Trust is built incrementally through repeated cycles of bid-and-response. Drawing on John Gottman's research, trust is not a single grand gesture — it's the accumulation of small moments where you show up for each other.</p>
+  <h4>The Bid Cycle</h4>
+  <ul><li><strong>Make a bid:</strong> Any attempt to connect — a question, a disclosure, a joke, a request for attention. Bids range from tiny ("Look at this sunset") to large ("I need to tell you something difficult").</li>
+  <li><strong>Respond to a bid:</strong> Three options: Turn toward (engage), turn away (ignore), or turn against (dismiss/criticize). Turning toward builds trust. The other two erode it.</li>
+  <li><strong>Reciprocate:</strong> When someone responds to your bid, take the next step. Deepen the disclosure, ask a follow-up question, share more. This creates the back-and-forth that builds genuine connection.</li></ul>
+  <p>Gottman's research found that couples who turn toward each other's bids 86% of the time stay together. Those who turn toward only 33% of the time divorce. The same principle applies to all relationships.</p>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>Think of your closest relationship. How often do you turn toward vs. away from bids?</li><li>What kinds of bids do you tend to miss or ignore?</li><li>What would change if you consciously turned toward 10% more bids this week?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('disclosure')">Disclosure Onion</span><span class="related-chip" onclick="openModal('tenet5')">Tenet: Care & Inquiry</span><span class="related-chip" onclick="openModal('johari')">Johari Window</span></div>` }
+},
+
+disclosure: { tag:'Model', tagClass:'tag-model', title:'The Disclosure Onion & Types', week:'Week 1 · Session 1b',
+  tabs: { 'Overview': `<p>The Disclosure Onion represents the layers of self that you can reveal to others, from the outer surface (facts, preferences) to the innermost core (authentic self — fears, desires, identity). Each layer involves more risk and creates more connection.</p>
+  <h4>Three Types of Disclosure</h4>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">Then & Here</strong> — Sharing a past experience in this present context. "Growing up, I always felt like the outsider in groups." Lower risk because it's historical, but builds understanding of who you are and why.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">There & Now</strong> — Sharing current feelings about something outside this context. "I've been feeling anxious about a situation at work." Moderate risk and moderate connection — it's current but not about the present interaction.</p></div>
+  <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">Here & Now</strong> — Sharing what you're feeling right now, in this moment, about what's happening. "I'm noticing I feel nervous sharing this with you right now." Highest risk AND highest impact. This is where the deepest connection happens.</p></div>
+  <p>The course progressively pushes students toward more Here & Now disclosure — the type that creates the strongest bonds and the most learning about interpersonal dynamics.</p>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>Which type of disclosure comes most naturally to you? Which feels most risky?</li><li>In your most important relationships, how deep do your disclosures typically go?</li><li>What's a "Here & Now" truth you could share with someone today?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('johari')">Johari Window</span><span class="related-chip" onclick="openModal('tenet3')">Tenet: Self-Disclosure</span><span class="related-chip" onclick="openModal('levels5')">5 Levels of Communication</span></div>` }
+},
+
+tgroup: { tag:'Concept', tagClass:'tag-concept', title:'T-Group Design', week:'Week 1 · Session 1c',
+  tabs: { 'Overview': `<p>The T-group (Training Group) is the heart of the course — a group of approximately 12 students who meet regularly as a live laboratory for interpersonal learning. Three design elements make it uniquely powerful:</p>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">One Task</strong> — The group's only task is to determine what to talk about that meets both individual and group needs. There's no external agenda, no case study, no assigned topic. This means the group must navigate its own process — which IS the learning.</p></div>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">No Formal Leader</strong> — Nobody is in charge. This creates a vacuum that forces everyone to grapple with influence, decision-making, and power — all core interpersonal dynamics. How does the group decide what to do? Who speaks? Who defers?</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Few Rules</strong> — Minimal structure beyond confidentiality and the 15% guideline. This requires the group to develop its own norms — and examining those norms becomes a rich source of learning about group dynamics.</p></div>
+  <h4>T-Group Learning Pillars</h4>
+  <ul><li><strong>Goals:</strong> Try new skills or share personally — this generates chances for others to engage with you</li>
+  <li><strong>Self-Awareness:</strong> Notice thoughts, assumptions, and underlying feelings — self-reflection reveals ideas for sharing</li>
+  <li><strong>Reactions:</strong> Share in service of own or others' learning and relationship — acknowledgement builds trust and expands understanding</li></ul>
+  <h4>Facilitators</h4>
+  <p>Facilitators ARE participative facilitators, role models for skills, experienced guides invested in your learning. They are NOT formal leaders, task drivers, or process directors. They model the skills rather than directing the conversation.</p>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>How do you typically behave in unstructured groups? Do you lead, follow, observe, or withdraw?</li><li>What would it be like to participate in a group with no formal leader and no agenda?</li><li>What interpersonal patterns might surface for you in that environment?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('groupdyn')">Group Dynamics</span><span class="related-chip" onclick="openModal('patterns')">Interactional Patterns</span><span class="related-chip" onclick="openModal('psych_safety')">Psychological Safety</span></div>` }
+},
+
+// ---- WEEK 2-4 MODALS ----
+netmodel: { tag:'Framework', tagClass:'tag-framework', title:'The Net Model', week:'Week 2 · Session 2',
+  tabs: { 'Overview': `<p>The Net Model reveals why miscommunication is the norm, not the exception. Every interaction involves three distinct realities, and we routinely confuse them:</p>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Your Reality (Sender)</strong> — Your intent, needs, motives, feelings. What you <em>meant</em> to communicate. This is invisible to the other person.</p></div>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">Shared Reality (The Net)</strong> — The only part that's actually observable: your words, tone of voice, facial expressions, body language, gestures. This is a tiny fraction of your full experience — the "Shrunken Share."</p></div>
+  <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">My Reality (Receiver)</strong> — My reaction, feelings, judgments, assumptions, interpretations. What I <em>made</em> of your communication. This is also invisible to you.</p></div>
+  <p>The fundamental error: <strong>we judge ourselves by our intent but judge others by their impact on us.</strong> You know what you meant; I only know how it felt to me. The Net Model teaches you to bridge this gap by sharing more of your reality and getting curious about theirs.</p>
+  <h4>The Shrunken Share</h4>
+  <p>Of everything we think, feel, and intend, only a tiny sliver makes it into the "Shared Reality." Most of our experience stays private — which means most of the data needed for understanding is missing from the conversation. The course encourages expanding the share through disclosure and the sentence stem.</p>`,
+  'In Practice': `<div class="example-box"><div class="label">The Net Model in Action</div><p style="font-size:13px;margin:0;"><strong>Situation:</strong> In a meeting, you suggest an idea and your colleague says "That's interesting" in a flat tone, then changes the subject.<br><br>
+  <strong>Your Reality:</strong> You intended to contribute a creative solution. You feel excited about the idea.<br>
+  <strong>Shared Reality:</strong> Words ("That's interesting"), flat tone, subject change.<br>
+  <strong>My Reality:</strong> You might interpret this as dismissal, feel hurt, assume they think your idea is stupid, and withdraw from the rest of the meeting.<br><br>
+  <strong>With the Net Model:</strong> You recognize that your interpretation is <em>your</em> reality, not necessarily theirs. Instead of withdrawing, you check: "When you said 'that's interesting' and moved on, I felt like my idea was dismissed. Was that your intent?"</p></div>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>Think of a recent miscommunication. Can you map it onto the three realities?</li><li>How often do you check your assumptions about others' intent?</li><li>What percentage of your inner experience do you typically share in conversations?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('sentence')">Sentence Stem</span><span class="related-chip" onclick="openModal('conflict')">Productive Conflict</span><span class="related-chip" onclick="openModal('feedback')">Feelings-Based Feedback</span></div>` }
+},
+
+conflict: { tag:'Framework', tagClass:'tag-framework', title:'Foundation for Productive Conflict', week:'Week 2 · Session 2',
+  tabs: { 'Overview': `<p>Conflict is inevitable in any authentic relationship. The question isn't whether conflict will happen — it's whether it will be <strong>destructive</strong> or <strong>creative</strong>. This framework provides six sequential building blocks:</p>
+  <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">1. Care</strong> — Start with genuine concern for the other person and the relationship. If you don't care, the conflict won't be productive. Ask yourself: "Do I actually want this to go well for both of us?"</p></div>
+  <div class="detail-box" style="background:var(--gold-light);"><p style="margin:0;"><strong style="color:#e67e22;">2. Curiosity</strong> — Approach with a desire to understand, not to win. Replace certainty with genuine questions. "I'm curious about your perspective" rather than "Here's why you're wrong."</p></div>
+  <div class="detail-box" style="background:var(--warm);"><p style="margin:0;"><strong style="color:var(--gold);">3. Context</strong> — Seek to understand the full picture. What's happening for them? What history or systemic factors are at play? Context doesn't excuse harmful behavior, but it enables compassion.</p></div>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">4. Compassion</strong> — Hold the other person's humanity alongside your own. Even when you disagree, maintain empathy for their experience.</p></div>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">5. Connection</strong> — Reaffirm the relationship. "I'm bringing this up because I value our relationship." Connection provides the safety container for difficult conversations.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">6. Creative Conflict</strong> — Now you can engage with the actual disagreement productively. With the previous five foundations in place, conflict becomes generative rather than destructive.</p></div>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>Which of the six building blocks is hardest for you to maintain during conflict?</li><li>Think of a conflict that went badly. Which foundation was missing?</li><li>How might you prepare for a difficult conversation using these six steps?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('flooding')">Emotional Flooding</span><span class="related-chip" onclick="openModal('sentence')">Sentence Stem</span><span class="related-chip" onclick="openModal('tenet6')">Tenet: Tough Care</span></div>` }
+},
+
+sentence: { tag:'Tool', tagClass:'tag-tool', title:'The Communication Sentence Stem', week:'Week 2 · Session 2',
+  tabs: { 'Overview': `<p>A deceptively simple tool that transforms how you communicate during difficult moments. The stem separates observation from interpretation and takes ownership of your reaction:</p>
+  <div class="detail-box" style="background:var(--green-light);font-size:15px;line-height:2;">
+  <p style="margin:0;"><strong>"When you said/did</strong> [specific observable behavior]...<br>
+  <strong>I thought/felt/assumed</strong> [your inner experience]...<br>
+  <strong>and I would like to ask/request</strong> [what you want or need]..."</p></div>
+  <h4>Why Each Part Matters</h4>
+  <ul><li><strong>"When you said/did"</strong> — Forces you to describe observable behavior (Shared Reality) rather than your interpretation. Not "When you were rude" but "When you interrupted me."</li>
+  <li><strong>"I thought/felt/assumed"</strong> — Takes ownership. This is YOUR reality, not objective truth. It invites dialogue rather than defensiveness.</li>
+  <li><strong>"And I would like to ask"</strong> — Moves toward resolution. It could be a request ("I'd like you to let me finish"), a question ("Was that your intention?"), or an invitation ("Can we talk about this?").</li></ul>`,
+  'Examples': `<h4>Practical Examples</h4>
+  <div class="example-box"><div class="label">Instead of: "You don't care about my opinion."</div><p style="font-size:13px;margin:0;">"When you checked your phone while I was sharing my idea, I felt unimportant and assumed you weren't interested. I'd like to ask — were you distracted, or was something else going on?"</p></div>
+  <div class="example-box"><div class="label">Instead of: "You always dominate the conversation."</div><p style="font-size:13px;margin:0;">"When I noticed you spoke for about 10 minutes without pausing, I felt like there wasn't space for me to contribute. I'd like to request that we check in with the group periodically to make sure everyone who wants to speak can."</p></div>
+  <div class="example-box"><div class="label">Instead of: "That was hurtful."</div><p style="font-size:13px;margin:0;">"When you said my approach wouldn't work, I felt deflated and assumed you were dismissing my experience. I'd like to understand — what specifically concerned you about my approach?"</p></div>
+  <div class="exercise-box"><div class="label">Exercise</div><p style="font-size:13px;margin:0;">Think of a recent interaction that bothered you. Draft a sentence using the stem. Notice how it changes the energy from blame to ownership and curiosity.</p></div>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>What's your default when you feel hurt — do you attack, withdraw, or suppress?</li><li>How would using this stem change a current difficult conversation in your life?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('netmodel')">Net Model</span><span class="related-chip" onclick="openModal('feedback')">Feelings-Based Feedback</span><span class="related-chip" onclick="openModal('feelings')">Feelings Literacy</span></div>` }
+},
+
+reap: { tag:'Framework', tagClass:'tag-framework', title:'The REAP Model', week:'Week 3 · Session 3',
+  tabs: { 'Overview': `<p>REAP provides a structured approach to emotional agility — the ability to work with your emotions rather than being controlled by them. Based on Susan David's work:</p>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">R — Recognize</strong> — Name the feeling. Be specific: not just "bad" but "anxious" or "embarrassed" or "disappointed." Research shows that labeling emotions actually reduces their intensity (affect labeling). The more granular your vocabulary, the more agency you have.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">E — Examine</strong> — Get curious about why this feeling came up. What triggered it? What need or value is at stake? Is this about the current situation or does it connect to a deeper pattern? "I feel angry" → "I feel angry because my need for respect wasn't met" → "This reminds me of how I felt when..."</p></div>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">A — Assess</strong> — What are your options? You always have choices, even when it doesn't feel like it. You could: respond immediately, pause and return later, share your feeling, ask a question, leave the conversation, seek more information. List at least 3 options.</p></div>
+  <div class="detail-box" style="background:var(--purple-light);"><p style="margin:0;"><strong style="color:var(--purple);">P — Pick</strong> — Choose the action most aligned with your values and goals, not the one driven by impulse. "Given that I value this relationship and my goal is to be more direct, I'm going to share how I feel right now."</p></div>`,
+  'In Practice': `<div class="example-box"><div class="label">REAP in Real Time</div><p style="font-size:13px;margin:0;"><strong>Situation:</strong> A colleague takes credit for your idea in a meeting.<br><br>
+  <strong>R:</strong> I feel angry. And underneath that, hurt and disrespected.<br>
+  <strong>E:</strong> This triggered my pattern of not speaking up and then resenting others. It connects to my fear that I'm invisible.<br>
+  <strong>A:</strong> I could (1) say nothing and stew, (2) confront them publicly, (3) talk to them privately after, (4) address it in the meeting calmly.<br>
+  <strong>P:</strong> Given my value of directness and my goal of advocating for myself, I'll say in the meeting: "I appreciate you building on that — I want to note that I originally raised this idea earlier. I'd love for us to develop it together."</p></div>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>How large is your emotional vocabulary? Can you name 20 distinct emotions?</li><li>When you feel a strong emotion, do you tend to act on it immediately or suppress it?</li><li>What would change if you could reliably insert a REAP pause before reacting?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('feelings')">Feelings Literacy</span><span class="related-chip" onclick="openModal('flooding')">Emotional Flooding</span><span class="related-chip" onclick="openModal('tenet2')">Tenet: Self-Regulation</span></div>` }
+},
+
+feelings: { tag:'Concept', tagClass:'tag-concept', title:'Feelings vs. Social Feelings vs. Beliefs', week:'Week 3 · Session 3',
+  tabs: { 'Overview': `<p>A critical distinction for emotional literacy. Many things we call "feelings" are actually judgments, beliefs, or interpretations — and confusing them leads to miscommunication.</p>
+  <div class="detail-box" style="background:#d4edda;"><p style="margin:0;"><strong style="color:var(--green);">Core Feelings</strong> — Basic emotional states with clear bodily sensations: happy, sad, angry, afraid, surprised, disgusted. These are universal, cross-cultural, and <em>embodied</em> — you feel them in your body. "I feel sad" = a heaviness in my chest.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Social Feelings</strong> — Emotions that require social context: embarrassed, jealous, guilty, proud, grateful, ashamed, lonely, envious. These arise in relationship and tell you something about your social needs and values.</p></div>
+  <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">Beliefs Masquerading as Feelings</strong> — Statements that start with "I feel" but are actually interpretations: "I feel like you don't care" (belief about other), "I feel disrespected" (judgment), "I feel like this is unfair" (assessment). These are important data, but labeling them as feelings can shut down dialogue.</p></div>
+  <h4>Why This Matters</h4>
+  <p>"I feel like you don't listen to me" invites defensiveness. "I feel unheard and frustrated" invites curiosity. The first is a judgment disguised as a feeling. The second is an authentic emotional state that the other person can respond to.</p>`,
+  'Reflection': `<div class="exercise-box"><div class="label">Exercise</div><p style="font-size:13px;margin:0;">Translate these belief-statements into actual feelings:<br>• "I feel like nobody cares" → "I feel lonely and sad"<br>• "I feel disrespected" → "I feel hurt and angry"<br>• "I feel like you're wrong" → "I feel frustrated and confused"</p></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('reap')">REAP Model</span><span class="related-chip" onclick="openModal('wisdom')">Wisdom of Feelings</span><span class="related-chip" onclick="openModal('sentence')">Sentence Stem</span></div>` }
+},
+
+wisdom: { tag:'Concept', tagClass:'tag-concept', title:'The Wisdom of Feelings', week:'Week 3 · Session 3',
+  tabs: { 'Overview': `<p>Emotions are not obstacles to clear thinking — they carry essential information that rationality alone cannot provide. Five dimensions of emotional wisdom:</p>
+  <ul><li><strong>Connection:</strong> Feelings signal the quality of your relationships. Warmth tells you a bond is strong; resentment tells you something needs attention.</li>
+  <li><strong>Value:</strong> Strong emotions reveal what matters to you. If you feel furious about an injustice, that tells you fairness is a core value.</li>
+  <li><strong>Insight:</strong> Emotions illuminate blind spots. If you feel inexplicably anxious around a certain person, that anxiety contains data about the dynamic.</li>
+  <li><strong>Triggers:</strong> Disproportionate emotional reactions point to deeper patterns — often from early experiences. These are invitations to self-understanding.</li>
+  <li><strong>Conflict guidance:</strong> Emotions guide you through disagreements. Fear might tell you to pause. Anger might tell you a boundary was crossed. Sadness might tell you something was lost.</li></ul>
+  <p>Attuning to emotions means learning to listen to them as a source of data rather than treating them as noise to be suppressed.</p>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>What emotions do you tend to suppress or avoid? What information might they be carrying?</li><li>Think of a time a "gut feeling" turned out to be right. What was it telling you?</li><li>Which of the five wisdoms (connection, value, insight, triggers, conflict) is most relevant to you right now?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('reap')">REAP Model</span><span class="related-chip" onclick="openModal('feelings')">Feelings Literacy</span></div>` }
+},
+
+scarf: { tag:'Framework', tagClass:'tag-framework', title:'The SCARF Model', week:'Week 4 · Session 4',
+  tabs: { 'Overview': `<p>David Rock's SCARF model identifies five domains where the brain detects social threats and rewards. When threatened in any domain, the brain activates the same fight/flight system as a physical threat — making clear thinking nearly impossible.</p>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">S — Status</strong> — Your relative importance to others. <em>Threat:</em> being corrected publicly, feeling one-down. <em>Reward:</em> recognition, acknowledgment of expertise. <em>Mitigation:</em> give positive feedback, ask for their opinion, frame suggestions as questions.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">C — Certainty</strong> — Ability to predict what happens next. <em>Threat:</em> ambiguity, surprises, vague expectations. <em>Reward:</em> clarity, transparency. <em>Mitigation:</em> share your intention upfront, set expectations, provide structure.</p></div>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">A — Autonomy</strong> — Sense of control over events. <em>Threat:</em> micromanagement, imposed decisions. <em>Reward:</em> choices, options. <em>Mitigation:</em> offer alternatives, ask "what would work for you?"</p></div>
+  <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">R — Relatedness</strong> — Whether someone is friend or foe. <em>Threat:</em> exclusion, coldness. <em>Reward:</em> belonging, warmth. <em>Mitigation:</em> share personal details, find common ground, use inclusive language.</p></div>
+  <div class="detail-box" style="background:var(--purple-light);"><p style="margin:0;"><strong style="color:var(--purple);">F — Fairness</strong> — Perception of just exchanges. <em>Threat:</em> inequity, hidden agendas. <em>Reward:</em> transparency, equal treatment. <em>Mitigation:</em> explain reasoning, be consistent, acknowledge imbalances.</p></div>`,
+  'In Practice': `<h4>SCARF for Giving Feedback</h4>
+  <p>Before giving someone difficult feedback, ask: Which SCARF domains might I inadvertently threaten? Then design your approach to minimize unnecessary threats:</p>
+  <div class="example-box"><div class="label">Example</div><p style="font-size:13px;margin:0;">Instead of giving critical feedback in a team meeting (threatens Status, Autonomy, and Relatedness), pull them aside privately (protects Status), frame it as "I'd like your perspective on something" (protects Autonomy), start with genuine appreciation (rewards Relatedness), and be transparent about your intent (rewards Certainty and Fairness).</p></div>
+  <div class="exercise-box"><div class="label">Exercise</div><p style="font-size:13px;margin:0;">Identify your personal SCARF sensitivities. Rank the five domains from most to least sensitive. Think about: which one, when threatened, makes you react most strongly? This is your "hot button."</p></div>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>What's your #1 SCARF trigger? What does a threat response look like for you in that domain?</li><li>Think of someone you find difficult. Which SCARF domain might you be inadvertently threatening in them?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('flooding')">Emotional Flooding</span><span class="related-chip" onclick="openModal('feedback')">Feelings-Based Feedback</span><span class="related-chip" onclick="openModal('tenet2')">Tenet: Self-Regulation</span></div>` }
+},
+
+levels5: { tag:'Model', tagClass:'tag-model', title:'Five Levels of Communication', week:'Week 4 · Session 4',
+  tabs: { 'Overview': `<p>Communication happens at different depths. Most everyday interaction stays at Levels 1-3. The course pushes you toward Levels 4-5, where the deepest connection and learning happen:</p>
+  <div class="detail-box" style="background:var(--warm-dark);"><p style="margin:0;"><strong>Level 1: Ritual</strong> — "Hey, how are you?" "Good, you?" Phatic communication. Social lubricant but zero intimacy. Necessary but insufficient.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Level 2: Extended Ritual</strong> — Small talk. Weather, sports, weekend plans. Sharing facts but nothing personal. Safe, low-risk, low-connection.</p></div>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">Level 3: Content</strong> — Sharing ideas, opinions, perspectives. "I think the project should go this way." Intellectual engagement but still guarded emotionally.</p></div>
+  <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">Level 4: Feelings about Content</strong> — How you <em>feel</em> about what's being discussed. "I'm excited about this project direction" or "I feel anxious about the deadline." Emotional engagement begins.</p></div>
+  <div class="detail-box" style="background:var(--purple-light);"><p style="margin:0;"><strong style="color:var(--purple);">Level 5: Feelings about the Other / Relationship</strong> — The deepest level. Here-and-now emotional truth about the person you're talking to. "I feel intimidated by you" or "I care about you and I'm scared to say this." This is where the most powerful connection — and the most powerful feedback — happens.</p></div>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>What level do you typically communicate at? With your partner? Your boss? Your friends?</li><li>What would happen if you moved one level deeper in your most important relationships?</li><li>What fears keep you from Level 5 communication?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('disclosure')">Disclosure Onion</span><span class="related-chip" onclick="openModal('tenet3')">Tenet: Self-Disclosure</span><span class="related-chip" onclick="openModal('feedback')">Feelings-Based Feedback</span></div>` }
+},
+
+flooding: { tag:'Concept', tagClass:'tag-concept', title:'Mutual Emotional Flooding', week:'Week 4 · Session 4',
+  tabs: { 'Overview': `<p>Based on John Gottman's extensive research: emotional flooding occurs when your emotional arousal becomes so intense that you lose access to your higher-order thinking. Your prefrontal cortex (reasoning) goes offline and your amygdala (threat detection) takes over.</p>
+  <h4>Physical Signs</h4><ul><li>Heart rate above 100 BPM (Gottman's research threshold)</li><li>Shallow, rapid breathing</li><li>Muscle tension, especially in jaw, shoulders, chest</li><li>Tunnel vision — you can only see the threat</li><li>"Hot" sensations — flushing, sweating</li></ul>
+  <h4>Interactional Signs (Gottman's "Four Horsemen")</h4>
+  <ul><li><strong>Criticism:</strong> Attacking character rather than behavior. "You always..." "You never..."</li><li><strong>Defensiveness:</strong> Counter-attacking or making excuses instead of hearing the message.</li><li><strong>Contempt:</strong> Superiority, disgust, eye-rolling. The single best predictor of relationship failure.</li><li><strong>Stonewalling:</strong> Shutting down, withdrawing, going silent. Often a response to flooding.</li></ul>
+  <h4>Recovery Protocol</h4><p>When flooded, the best strategy is to <strong>take a break</strong> — at least 20 minutes, because that's how long it takes for stress hormones to clear your system. Then return with REAP: Recognize what you felt, Examine why, Assess options, and Pick a thoughtful response.</p>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>What are your personal early warning signs of flooding?</li><li>Which of the Four Horsemen are you most prone to when flooded?</li><li>What's your go-to strategy for calming down? How effective is it?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('reap')">REAP Model</span><span class="related-chip" onclick="openModal('scarf')">SCARF Model</span><span class="related-chip" onclick="openModal('tenet2')">Tenet: Self-Regulation</span></div>` }
+},
+
+feedback: { tag:'Practice', tagClass:'tag-practice', title:'Feelings-Based Feedback', week:'Week 4 · Session 4',
+  tabs: { 'Overview': `<p>The most powerful form of feedback doesn't evaluate or advise — it shares your authentic emotional response to someone's behavior. "Here & Now" feedback is almost impossible to argue with because it's about YOUR experience, not an objective judgment.</p>
+  <h4>Three Types of Feedback (Ranked by Impact)</h4>
+  <div class="detail-box" style="background:var(--warm-dark);"><p style="margin:0;"><strong>Evaluative:</strong> "You're a bad listener." — Easy to dismiss, creates defensiveness. Judgment.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Advisory:</strong> "You should listen more." — Better, but still positions you as the expert on them. Can feel patronizing.</p></div>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">Feelings-Based:</strong> "When you looked at your phone while I was talking, I felt dismissed and unimportant." — Undeniable (it's your experience), specific (tied to behavior), and invites dialogue.</p></div>
+  <h4>How Feedback Expands the Johari Window</h4>
+  <p>Feedback moves information from the Blind Spot (things others see that you don't) to the Open area. It gives you data you literally cannot access any other way.</p>`,
+  'Tips': `<h4>Tips for Giving Feelings-Based Feedback</h4>
+  <ul><li>Be <strong>specific</strong> about the behavior (Shared Reality), not general</li><li>Own your <strong>feelings</strong> as yours, not as facts about them</li><li>Be <strong>timely</strong> — share close to when it happened</li><li>Check your <strong>intent</strong> — is this for their benefit or to vent?</li><li>Be prepared to <strong>listen</strong> to their response with genuine curiosity</li></ul>
+  <h4>Tips for Receiving Feedback</h4>
+  <ul><li><strong>Listen fully</strong> before responding. Let it land.</li><li><strong>Notice your body</strong> — are you flooding? If so, pause.</li><li>Say <strong>"Thank you"</strong> before anything else. Feedback is a gift.</li><li>Get <strong>curious</strong>: "Can you tell me more about when that happened?"</li><li>You don't have to <strong>agree</strong> — just receive the data. You can process it later.</li></ul>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>What's your typical reaction when receiving feedback? Do you deflect, defend, or listen?</li><li>What feedback have you been sitting on that someone would benefit from hearing?</li><li>Who in your life would you trust to give you honest feedback? Have you asked them?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('johari')">Johari Window</span><span class="related-chip" onclick="openModal('scarf')">SCARF Model</span><span class="related-chip" onclick="openModal('sentence')">Sentence Stem</span><span class="related-chip" onclick="openModal('tenet6')">Tenet: Tough Care</span></div>` }
+},
+
+// ---- WEEKS 5-9 MODALS ----
+inequality: { tag:'Framework', tagClass:'tag-framework', title:'System of Inequalities', week:'Week 5 · Session 5',
+  tabs: { 'Overview': `<p>Adapted from Shakti Butler / World Trust Educational, this framework shows that inequality operates simultaneously at multiple levels — and interpersonal dynamics cannot be fully understood without this context.</p>
+  <div class="detail-box" style="background:var(--purple-light);"><p style="margin:0;"><strong style="color:var(--purple);">Internal Level</strong><br>• <strong>Privilege:</strong> Unearned advantages from group membership you may not even notice<br>• <strong>Bias:</strong> Unconscious preferences and assumptions shaped by culture<br>• <strong>Internalized narratives:</strong> Beliefs about your own group and others' groups that you've absorbed</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">External Level</strong><br>• <strong>Interpersonal:</strong> How bias shows up in one-on-one interactions (microaggressions, assumptions)<br>• <strong>Institutional:</strong> Policies and practices that advantage some groups over others<br>• <strong>Structural:</strong> Interconnected systems that maintain inequality across institutions</p></div>
+  <div class="detail-box" style="background:var(--gold-light);"><p style="margin:0;"><strong style="color:var(--gold);">Central Forces</strong><br>• Power & Economics · History · Culture · Identity — these forces shape and connect all the levels</p></div>
+  <p>The key insight for interpersonal dynamics: personal interactions happen within these larger systems. To connect across differences, you need to be aware of both the interpersonal AND the systemic.</p>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>What privileges do you hold that you rarely think about?</li><li>How might systemic dynamics be affecting your current interpersonal relationships?</li><li>When have you experienced or witnessed how the "internal level" (bias, internalized narratives) affected an interpersonal interaction?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('crossdiff')">Connecting Across Differences</span><span class="related-chip" onclick="openModal('power')">Differential Power</span></div>` }
+},
+
+crossdiff: { tag:'Skill Areas', tagClass:'tag-skill', title:'Connecting Across Differences', week:'Week 5 · Session 5',
+  tabs: { 'Overview': `<p>The four core skill domains — adapted for the specific challenges of connecting across identity-based differences (race, gender, class, sexuality, ability, nationality, etc.):</p>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">Self-Awareness</strong> — Know your social identities. Understand which groups you belong to and how those memberships shape your experience, assumptions, and blind spots. Recognize when your privilege might make you blind to others' realities.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Social Awareness</strong> — Understand that others navigate different realities. Listen to lived experiences without defensiveness. Recognize power dynamics in the room. Be aware of who has voice and who doesn't.</p></div>
+  <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">Self-Management</strong> — Manage the discomfort that comes with these conversations. Resist the urge to defend, explain away, or center your own experience. Stay curious even when you feel accused or guilty.</p></div>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">Relationship Skills</strong> — Build bridges proactively. Address power dynamics directly rather than pretending they don't exist. Create space for all voices. Practice repair when you cause harm, even unintentionally.</p></div>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>Which of these four skill areas is most challenging for you in cross-difference contexts?</li><li>When was the last time you had a conversation about difference that felt productive? What made it work?</li><li>What's one step you could take this week to build a bridge across a difference?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('inequality')">System of Inequalities</span><span class="related-chip" onclick="openModal('power')">Differential Power</span><span class="related-chip" onclick="openModal('skills4')">Core Skill Domains</span></div>` }
+},
+
+power: { tag:'Concept', tagClass:'tag-concept', title:'Differential Power & Social Identity', week:'Week 5 · Session 5',
+  tabs: { 'Overview': `<p>Power in relationships isn't just about formal authority (boss/employee). It also flows through social identity dimensions: race, gender, class, sexuality, ability, age, religion, nationality, and more.</p>
+  <h4>Social Identity Development</h4>
+  <p>Each person moves through stages of awareness regarding their group memberships:</p>
+  <ul><li><strong>Unawareness:</strong> Not conscious of group membership or its significance</li>
+  <li><strong>Exploration:</strong> Beginning to examine what your identities mean and how they affect your experience</li>
+  <li><strong>Integration:</strong> Holding a complex, nuanced understanding of your identities and their interplay with systems of power</li></ul>
+  <p>People at different stages often have difficulty communicating about these topics — which is itself an interpersonal challenge that the course addresses.</p>
+  <p><strong>Key insight:</strong> Connecting across differences requires both understanding systemic dynamics AND doing personal interpersonal work. One without the other is incomplete. You can't just "be nice" without understanding systems, and you can't just understand systems without building real relationships.</p>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>Which of your social identities do you think about most? Least?</li><li>How might unexamined power dynamics be affecting a current relationship?</li><li>Where are you in your social identity development? What would the next stage look like?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('inequality')">System of Inequalities</span><span class="related-chip" onclick="openModal('crossdiff')">Connecting Across Differences</span><span class="related-chip" onclick="openModal('influence')">Interpersonal Influence</span></div>` }
+},
+
+influence: { tag:'Framework', tagClass:'tag-framework', title:'Components of Interpersonal Influence', week:'Week 6 · Session 6',
+  tabs: { 'Overview': `<p>The course reframes influence: it's not manipulation or coercion. Real interpersonal influence is <strong>two-way</strong> (both parties are affected) and <strong>not zero-sum</strong> (both can gain). Three components:</p>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">Personal Referent Power</strong> — People follow you because of who you are, not what position you hold. Built through: Authenticity & Trust · Self-Disclosure · Vulnerability · Consistency between your stated values and your actions. When people see you as genuine, they're drawn to your influence.</p></div>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">Role Model Norms</strong> — You influence the group by modeling the behavior you want to see. Components: Warmth & Care · Connecting Across Differences · Willingness to Disagree · Setting the standard through your own actions rather than telling others what to do.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Interpersonal Influence Skills</strong> — The tactical toolkit: Active Listening & Response · Giving and Receiving Feedback · Clear Communication. These skills, practiced throughout the course, are the mechanisms through which influence actually operates.</p></div>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>Which component of influence is strongest for you? Which is weakest?</li><li>Think of someone who has strong interpersonal influence. What specifically do they do?</li><li>Where is there a gap between your stated values and your behavior? How might closing that gap increase your influence?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('warmth')">Warmth vs. Competence</span><span class="related-chip" onclick="openModal('situational')">Situational Factors</span><span class="related-chip" onclick="openModal('trust')">Building Trust</span></div>` }
+},
+
+warmth: { tag:'Model', tagClass:'tag-model', title:'Warmth vs. Competence', week:'Week 6 · Session 6',
+  tabs: { 'Overview': `<p>From Amy Cuddy's research: people evaluate you on two fundamental dimensions — warmth and competence — and <strong>the order matters</strong>. Warmth is assessed first and carries more weight.</p>
+  <div class="detail-box" style="background:#d4edda;"><p style="margin:0;"><strong style="color:var(--green);">High Warmth + High Competence = Admired & Trusted</strong> — The ideal. People both like you and respect you. This combination creates genuine influence. These people are trusted leaders, close friends, valued colleagues.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Low Warmth + High Competence = Respected but Feared</strong> — Brilliant but cold. People comply but don't commit. They follow you out of necessity, not loyalty. Common in high-achievement environments like business school.</p></div>
+  <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">High Warmth + Low Competence = Liked but Not Respected</strong> — Nice but ineffective. People enjoy your company but don't seek your input on important decisions. Warmth without substance.</p></div>
+  <div class="detail-box" style="background:var(--warm-dark);"><p style="margin:0;"><strong>Low Warmth + Low Competence = Ignored or Dismissed</strong> — Neither liked nor respected. People avoid interaction.</p></div>
+  <p><strong>The critical insight for MBA students:</strong> Many high-achievers focus almost exclusively on demonstrating competence. But leading with competence without warmth breeds fear, not trust. The course argues: lead with warmth first, then demonstrate competence.</p>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>Do you tend to lead with warmth or competence? What would shifting that balance look like?</li><li>Think of a leader you admire. Where do they fall on this grid?</li><li>How do you demonstrate warmth? Is it through words, actions, presence, or something else?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('influence')">Interpersonal Influence</span><span class="related-chip" onclick="openModal('tenet5')">Tenet: Care & Inquiry</span></div>` }
+},
+
+situational: { tag:'Concept', tagClass:'tag-concept', title:'Situational Factors in Influence', week:'Week 6 · Session 6',
+  tabs: { 'Overview': `<p>Influence doesn't happen in a vacuum. Four key contextual factors shape whether and how influence works:</p>
+  <ul><li><strong>Timing:</strong> When you raise something matters as much as what you say. Reading emotional temperature, energy level, and readiness of the group is an influence skill.</li>
+  <li><strong>Relationship History:</strong> Every interaction is layered on previous ones. Trust built over time makes influence easier; past breaches make it harder. Repair work matters.</li>
+  <li><strong>Power Dynamics:</strong> Both formal (role, title) and informal (expertise, social capital, identity) power shape what influence strategies are available and effective.</li>
+  <li><strong>Group Norms:</strong> The explicit and implicit rules of the group either enable or constrain influence attempts. Challenging a norm requires different influence than working within one.</li></ul>
+  <div class="exercise-box"><div class="label">Exercise</div><p style="font-size:13px;margin:0;">Think of a time you tried to influence someone and it didn't work. Which situational factor did you miss? Was the timing off? Was there unresolved history? Were power dynamics at play? Did group norms work against you?</p></div>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>Which situational factor do you most often overlook?</li><li>How do you read the "temperature" of a group or relationship before attempting influence?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('influence')">Interpersonal Influence</span><span class="related-chip" onclick="openModal('groupdyn')">Group Dynamics</span></div>` }
+},
+
+groupdyn: { tag:'Concept', tagClass:'tag-concept', title:'Group Dynamics & Norms', week:'Weeks 7-8 · Weekend Retreat',
+  tabs: { 'Overview': `<p>Groups are living systems with their own patterns, norms, and developmental stages. Three key insights from the weekend retreat:</p>
+  <h4>1. Groups Move Through Stages</h4><p>From initial forming (politeness, caution) through storming (conflict, power struggles) to deeper engagement (authenticity, productive conflict). Progress isn't linear — groups can regress under stress.</p>
+  <h4>2. Norms Keep Us Stuck or Help Us Grow</h4><p>Every group develops implicit rules: Who speaks first? How long do we let silence last? Is it okay to cry? To disagree with the facilitator? These norms powerfully shape what's possible. <strong>Unexamined norms often limit learning</strong> — for example, a norm of "being nice" can prevent honest feedback.</p>
+  <h4>3. Leaders Help Teams Notice and Improve Norms</h4><p>Leadership in this context means having the courage to name what's happening at the group level: "I notice we always change the subject when things get emotional" or "It seems like only three people have spoken in the last 30 minutes." This meta-level observation is a powerful form of influence.</p>
+  <h4>Group-Level Debrief Process</h4><p>The retreat uses a structured debrief: Reflect on interactions → Notice patterns → Explore how to shift norms. This happens in half T-groups, followed by a gallery walk to share insights across groups.</p>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>What unexamined norms exist in a group you're part of? Are they helping or hindering?</li><li>What group-level observation would take courage for you to name?</li><li>How do you typically behave when a group is in the "storming" stage?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('patterns')">Interactional Patterns</span><span class="related-chip" onclick="openModal('tgroup')">T-Group Design</span><span class="related-chip" onclick="openModal('influence')">Interpersonal Influence</span></div>` }
+},
+
+patterns: { tag:'Tool', tagClass:'tag-tool', title:'Interactional Patterns', week:'Weeks 7-8 · Weekend Retreat',
+  tabs: { 'Overview': `<p>Common patterns that emerge in groups — recognizing them is the first step to changing them:</p>
+  <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">Hot Seat</strong> — One person is always the focus. Others give feedback or ask questions, but the attention is one-directional. Can feel supportive but also pressuring.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Sustained Pair</strong> — Two people engage in extended dialogue while others watch. Can be deep but excludes the group.</p></div>
+  <div class="detail-box" style="background:var(--purple-light);"><p style="margin:0;"><strong style="color:var(--purple);">Unequal Airtime</strong> — Some voices dominate, others are barely heard. Often mirrors external power dynamics.</p></div>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">By-pass</strong> — Certain individuals get skipped or their contributions go unacknowledged. Can feel invisible.</p></div>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">Sub-groups Dominate</strong> — Cliques or alliances form, creating in-group/out-group dynamics within the T-group.</p></div>
+  <div class="detail-box" style="background:var(--gold-light);"><p style="margin:0;"><strong style="color:var(--gold);">Popcorn</strong> — Quick, surface-level exchanges. Everyone speaks briefly but nothing goes deep. Feels egalitarian but avoids depth.</p></div>
+  <p>Additional patterns: Returning to past conversations, brief bookmark for future, slow/fast pace, prolonged conversations on safe topics.</p>`,
+  'Reflection': `<div class="exercise-box"><div class="label">Exercise</div><p style="font-size:13px;margin:0;">In your next group meeting, observe: Which of these patterns are present? Who has the most airtime? What happens in silence? What topics get energy and which get avoided? Take notes without judging — just notice.</p></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('groupdyn')">Group Dynamics</span><span class="related-chip" onclick="openModal('influence')">Interpersonal Influence</span></div>` }
+},
+
+closure: { tag:'Practice', tagClass:'tag-practice', title:'Honorable Closure', week:'Week 8 · Session 8',
+  tabs: { 'Overview': `<p>Ending relationships, experiences, and groups with <strong>intention and integrity</strong> rather than letting them fade away. The closure process has three key steps:</p>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">1. What's Unfinished?</strong> — Name what feels incomplete. The clock is ticking, but there's still time. What conversations haven't happened? What feelings haven't been expressed? What relationships need attention?</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">2. Accept It?</strong> — Share the full range of feelings (acceptance AND...) about leaving something unfinished. Sometimes acceptance is the right response — and naming what you're accepting makes the acceptance more real.</p></div>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">3. Raise It?</strong> — Reframe "it's not worth it." Maybe it IS worth the risk. Prioritize: what matters most? What would you regret not saying?</p></div>
+  <h4>Three Levels of Unfinished Business</h4>
+  <ul><li><strong>Intrapersonal:</strong> "More I want you to know about me" — deeper self-disclosure that hasn't happened</li>
+  <li><strong>Interpersonal:</strong> Resolve a disconnect, repair a rupture, or strengthen a connection with a specific person</li>
+  <li><strong>Group:</strong> Feeling included, heard, connected... or not? What does the group need before ending?</li></ul>
+  <p>The closure session includes paired conversations (~6 minutes each, one-way sharing) where each person receives specific, genuine feedback as a gift to carry forward. The process ends with <strong>acknowledgement of the work accomplished together</strong>.</p>`,
+  'Reflection': `<div class="reflection-box"><div class="label">Reflection Questions</div><ul style="margin:8px 0 0;"><li>What relationships in your life have ended without proper closure? What was left unsaid?</li><li>What would it look like to practice "honorable closure" the next time something ends — a project, a team, a chapter of life?</li><li>Right now, what unfinished conversation most needs your attention?</li></ul></div>
+  <div class="related-chips"><span class="related-chip" onclick="openModal('tenet4')">Tenet: Vulnerability</span><span class="related-chip" onclick="openModal('tenet6')">Tenet: Tough Care</span><span class="related-chip" onclick="openModal('disclosure')">Disclosure Types</span></div>` }
+},
+
+integration: { tag:'Integration', tagClass:'tag-framework', title:'From T-Group to Real Life', week:'Week 9 · Final Session',
+  tabs: { 'Overview': `<p>The final session brings the entire course together into a portable set of principles and skills. The six tenets are the essence — here's how each translates to life beyond the T-group:</p>
+  <div class="detail-box" style="background:var(--teal-light);"><p style="margin:0;"><strong style="color:var(--teal);">Reflection → Awareness:</strong> Build a regular reflection practice. Journal, meditate, debrief conversations. The habit of pausing to notice — your feelings, others' reactions, group dynamics — is the foundation of everything else.</p></div>
+  <div class="detail-box" style="background:var(--blue-light);"><p style="margin:0;"><strong style="color:var(--blue);">Self-Regulation → Agency:</strong> Between stimulus and response, there is a space. Learning to use that space — through REAP, through recognizing flooding, through managing SCARF triggers — gives you the power of choice.</p></div>
+  <div class="detail-box" style="background:var(--green-light);"><p style="margin:0;"><strong style="color:var(--green);">Disclosure → Connection:</strong> Sharing who you really are — your fears, dreams, struggles — is the hook that invites others into genuine relationship with you. Start small. Go deeper over time.</p></div>
+  <div class="detail-box" style="background:var(--coral-light);"><p style="margin:0;"><strong style="color:var(--coral);">Vulnerability → Depth:</strong> Vulnerability is not weakness — it's the quickest path to real connection. When you risk being seen, you give others permission to do the same.</p></div>
+  <div class="detail-box" style="background:var(--purple-light);"><p style="margin:0;"><strong style="color:var(--purple);">Care + Inquiry → Trust:</strong> Genuine curiosity paired with warmth builds the psychological safety that makes all learning possible. Ask more questions. Lead with care. Turn toward bids.</p></div>
+  <div class="detail-box" style="background:var(--gold-light);"><p style="margin:0;"><strong style="color:var(--gold);">Tough Care → Strength:</strong> Caring enough to challenge someone — giving honest feedback, naming difficult truths — strengthens relationships rather than breaking them. Avoidance is not kindness.</p></div>`,
+  'Quotes & Wisdom': `<div class="quote-block">"I want to love you without clutching, appreciate you without judging, join you without invading, invite you without demanding, leave you without guilt, criticize you without blaming, and help you without insulting. If I can have the same from you, then we can truly meet and enrich each other."<div class="quote-author">— Virginia Satir</div></div>
+  <div class="quote-block" style="border-left-color:var(--teal);">"To see ourselves as others see us is a most salutary gift. Hardly less important is the capacity to see others as they see themselves."<div class="quote-author">— Aldous Huxley</div></div>
+  <h4>The Challenge Going Forward</h4>
+  <p>The T-group is a uniquely supportive environment. The real test is applying these skills in messier, less structured contexts: at work, at home, with strangers. The frameworks are portable. The principles are universal. But the practice is ongoing — you'll cycle through the Experiential Learning Cycle for the rest of your life.</p>
+  <div class="exercise-box"><div class="label">Final Exercise</div><p style="font-size:13px;margin:0;">Choose ONE tenet to focus on for the next 30 days. Set a specific, observable goal. Practice daily. Reflect weekly. Notice what changes — in you and in your relationships.</p></div>`,
+  'All Frameworks': `<h4>Complete Framework Reference</h4>
+  <p>Click any framework to revisit it:</p>
+  <div class="related-chips">
+  <span class="related-chip" onclick="openModal('elc')">Experiential Learning Cycle</span>
+  <span class="related-chip" onclick="openModal('zone15')">15% Zone</span>
+  <span class="related-chip" onclick="openModal('johari')">Johari Window</span>
+  <span class="related-chip" onclick="openModal('trust')">Building Trust</span>
+  <span class="related-chip" onclick="openModal('disclosure')">Disclosure Onion</span>
+  <span class="related-chip" onclick="openModal('netmodel')">Net Model</span>
+  <span class="related-chip" onclick="openModal('conflict')">Productive Conflict</span>
+  <span class="related-chip" onclick="openModal('sentence')">Sentence Stem</span>
+  <span class="related-chip" onclick="openModal('reap')">REAP Model</span>
+  <span class="related-chip" onclick="openModal('scarf')">SCARF Model</span>
+  <span class="related-chip" onclick="openModal('levels5')">5 Levels of Communication</span>
+  <span class="related-chip" onclick="openModal('flooding')">Emotional Flooding</span>
+  <span class="related-chip" onclick="openModal('warmth')">Warmth vs. Competence</span>
+  <span class="related-chip" onclick="openModal('influence')">Interpersonal Influence</span>
+  <span class="related-chip" onclick="openModal('groupdyn')">Group Dynamics</span>
+  <span class="related-chip" onclick="openModal('closure')">Honorable Closure</span>
+  </div>` }
+}
+
+}; // end MODALS
+
+// ===== MODAL FUNCTIONS =====
+function openModal(id) {
+  const data = MODALS[id];
+  if (!data) return;
+  const overlay = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  const tabKeys = Object.keys(data.tabs);
+  let tabsHtml = '<div class="modal-tabs">';
+  tabKeys.forEach((key, i) => {
+    tabsHtml += `<button class="modal-tab${i===0?' active':''}" onclick="switchTab(this,'tab_${id}_${i}')">${key}</button>`;
+  });
+  tabsHtml += '</div>';
+  let tabContent = '';
+  tabKeys.forEach((key, i) => {
+    tabContent += `<div class="tab-content${i===0?' active':''}" id="tab_${id}_${i}">${data.tabs[key]}</div>`;
+  });
+  content.innerHTML = `
+    <button class="modal-close" onclick="closeModal()" title="Close">&times;</button>
+    <div class="modal-header">
+      <span class="card-tag ${data.tagClass}">${data.tag}</span>
+      <h2>${data.title}</h2>
+      <div class="modal-week">${data.week}</div>
+    </div>
+    <div class="modal-body">
+      ${tabsHtml}
+      ${tabContent}
+    </div>`;
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => { overlay.classList.add('show'); });
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.remove('show');
+  setTimeout(() => { overlay.style.display = 'none'; }, 200);
+  document.body.style.overflow = '';
+}
+
+function switchTab(btn, tabId) {
+  const parent = btn.closest('.modal-body');
+  parent.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+  parent.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+// Close on Escape
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+// Smooth scroll & active nav
+function scrollTo_(id) { document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+const sections = document.querySelectorAll('.section');
+const navBtns = document.querySelectorAll('.nav-btn');
+const sectionIds = ['overview','tenets','week1','week2','week3','week4','week5','week6','week78','week9'];
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if(window.scrollY >= s.offsetTop - 100) current = s.id; });
+  navBtns.forEach((btn, i) => { btn.classList.toggle('active', sectionIds[i] === current); });
+});
+
+
+  // Dark mode toggle
+  const darkToggle = document.getElementById('darkToggle');
+  const htmlElement = document.documentElement;
+  
+  // Load saved theme preference
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  htmlElement.setAttribute('data-theme', savedTheme);
+  
+  darkToggle.addEventListener('click', () => {
+    const currentTheme = htmlElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    htmlElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
+
+  // Search functionality
+  const searchToggle = document.getElementById('searchToggle');
+  const searchOverlay = document.getElementById('searchOverlay');
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+  const searchCount = document.getElementById('searchCount');
+
+  searchToggle.addEventListener('click', () => {
+    searchOverlay.classList.add('show');
+    searchInput.focus();
+  });
+
+  searchOverlay.addEventListener('click', (e) => {
+    if (e.target === searchOverlay) {
+      searchOverlay.classList.remove('show');
+    }
+  });
+
+  // Build search data from modals
+  const searchData = [];
+  for (const [key, modal] of Object.entries(MODALS)) {
+    searchData.push({
+      title: modal.title || key,
+      category: modal.category || 'Framework',
+      content: modal.content || '',
+      tags: modal.tags || []
+    });
+  }
+
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase();
+    
+    if (query.length === 0) {
+      searchResults.innerHTML = '';
+      searchCount.innerHTML = '';
+      return;
+    }
+
+    const results = searchData.filter(item => 
+      item.title.toLowerCase().includes(query) ||
+      item.content.toLowerCase().includes(query) ||
+      item.category.toLowerCase().includes(query)
+    );
+
+    searchResults.innerHTML = results.map(result => `
+      <div class="search-item" onclick="openModal('${Object.keys(MODALS).find(k => MODALS[k].title === result.title) || key}')">
+        <div class="search-item-title">
+          ${result.title}
+          <span class="search-item-tag">${result.category}</span>
+        </div>
+        <div class="search-item-preview">${result.content.substring(0, 100)}...</div>
+      </div>
+    `).join('');
+
+    searchCount.innerHTML = `Found ${results.length} result${results.length !== 1 ? 's' : ''}`;
+  });
+
+  // Flashcard mode
+  const flashToggle = document.getElementById('flashToggle');
+  const flashcardOverlay = document.getElementById('flashcardOverlay');
+  const flashcardInner = document.getElementById('flashcardInner');
+  const cardQuestion = document.getElementById('cardQuestion');
+  const cardAnswer = document.getElementById('cardAnswer');
+  const cardTag = document.getElementById('cardTag');
+  const cardIndex = document.getElementById('cardIndex');
+  const fcPrev = document.getElementById('fcPrev');
+  const fcNext = document.getElementById('fcNext');
+  const fcClose = document.getElementById('fcClose');
+
+  const flashcards = [
+    {q: "What are the 6 Core Tenets of OB 374?", a: "1) Reflection & Self-Awareness, 2) Self-Regulation & Emotional Agility, 3) Self-Disclosure & Authenticity, 4) Vulnerability as Strength, 5) Care & Genuine Inquiry, 6) Tough Care & Honest Feedback", tag: "Core Tenets"},
+    {q: "What is the Experiential Learning Cycle?", a: "Experience → Reflect → Conceptualize → Experiment → back to Experience. Learning happens through doing, reflecting on what happened, forming theories about why, and experimenting with new approaches.", tag: "Framework"},
+    {q: "What is the '15% Zone'?", a: "The sweet spot between comfort zone and danger zone where optimal learning happens. Take risks that are challenging enough to grow but not so overwhelming you shut down. Think of it as 15% outside your comfort zone.", tag: "Model"},
+    {q: "Describe the four panes of the Johari Window.", a: "Open (known to self & others), Blind Spot (known to others, not self), Hidden (known to self, not others), Unknown (known to neither). Growth means expanding the Open area through feedback and disclosure.", tag: "Model"},
+    {q: "What is Psychological Safety?", a: "The shared belief that the group is safe for interpersonal risk-taking (Amy Edmondson). It doesn't mean comfort — it means you won't be punished for being honest, vulnerable, or making mistakes.", tag: "Concept"},
+    {q: "What is the Conscious/Unconscious × Skilled/Unskilled matrix?", a: "Four stages: Unconscious Unskilled (blind spots), Conscious Unskilled (aware of gap), Conscious Skilled (can do it with effort), Unconscious Skilled (mastery, automatic). OB374 moves you from stage 1→2→3.", tag: "Model"},
+    {q: "What are the Four Core Skill Domains?", a: "Self-Awareness (knowing your patterns), Social Awareness (reading others), Self-Management (regulating responses), Relationship Skills (building connections). Maps to a 2×2: Self vs Others × Awareness vs Action.", tag: "Skill Areas"},
+    {q: "How is trust built according to Gottman's research?", a: "Through repeated cycles of bid-and-response. Bids are any attempt to connect. Three responses: Turn toward (engage, builds trust), Turn away (ignore, erodes trust), Turn against (dismiss, erodes trust). Couples who turn toward 86% stay together.", tag: "Practice"},
+    {q: "What are the three types of disclosure?", a: "Then & Here (past experience in present context — lower risk), There & Now (current feelings about outside context — moderate risk), Here & Now (what you feel right now about what's happening — highest risk, deepest connection).", tag: "Model"},
+    {q: "What are the three elements of T-Group design?", a: "1) One Task: determine what to talk about that meets individual and group needs, 2) No Formal Leader: creates a vacuum for learning about influence and power, 3) Few Rules: group develops its own norms.", tag: "Concept"},
+    {q: "Explain the Net Model.", a: "Three realities in every interaction: Your Reality (intent, invisible to other), Shared Reality (observable words/tone/body language — the 'Shrunken Share'), My Reality (interpretation, invisible to you). Key insight: we judge ourselves by intent, others by impact.", tag: "Framework"},
+    {q: "What are the 6 building blocks of Productive Conflict?", a: "Care → Curiosity → Context → Compassion → Connection → Creative Conflict. Each builds on the previous. Without the first 5 foundations, conflict becomes destructive rather than generative.", tag: "Framework"},
+    {q: "What is the Communication Sentence Stem?", a: "\"When you said/did [specific observable behavior], I thought/felt/assumed [your inner experience], and I would like to ask/request [what you want or need].\" Separates observation from interpretation and takes ownership.", tag: "Tool"},
+    {q: "What does REAP stand for?", a: "Recognize (name the feeling specifically), Examine (why did it come up?), Assess (what are your options? list 3+), Pick (choose the response aligned with your values, not impulse).", tag: "Framework"},
+    {q: "What's the difference between Core Feelings, Social Feelings, and Beliefs?", a: "Core Feelings: basic emotional states with bodily sensations (happy, sad, angry, afraid). Social Feelings: require social context (embarrassed, jealous, proud). Beliefs masquerading as feelings: 'I feel like you don't care' — actually a judgment.", tag: "Concept"},
+    {q: "What are the 5 wisdoms of feelings?", a: "Connection (quality of relationships), Value (what matters to you), Insight (illuminating blind spots), Triggers (pointing to deeper patterns), Conflict guidance (fear=pause, anger=boundary crossed, sadness=loss).", tag: "Concept"},
+    {q: "What does SCARF stand for?", a: "Status (relative importance), Certainty (predictability), Autonomy (sense of control), Relatedness (friend or foe), Fairness (just exchanges). When threatened in any domain, brain activates fight/flight.", tag: "Framework"},
+    {q: "What are the Five Levels of Communication?", a: "1) Ritual ('Hey, how are you?'), 2) Extended Ritual (small talk), 3) Content (ideas/opinions), 4) Feelings about Content ('I'm excited about this'), 5) Feelings about the Other/Relationship ('I feel intimidated by you'). OB374 pushes toward Level 5.", tag: "Model"},
+    {q: "What is Emotional Flooding?", a: "When emotional arousal is so intense you lose access to higher-order thinking. Heart rate above 100 BPM. Recovery requires at least 20 minutes for stress hormones to clear. Then use REAP.", tag: "Concept"},
+    {q: "What are Gottman's Four Horsemen?", a: "Criticism (attacking character), Defensiveness (counter-attacking), Contempt (superiority, disgust — the #1 predictor of relationship failure), Stonewalling (shutting down). Signs of emotional flooding in conflict.", tag: "Concept"},
+    {q: "What are the three types of feedback ranked by impact?", a: "Evaluative ('You're a bad listener' — easy to dismiss), Advisory ('You should listen more' — patronizing), Feelings-Based ('When you looked at your phone, I felt dismissed' — undeniable, specific, invites dialogue).", tag: "Practice"},
+    {q: "What is the System of Inequalities framework?", a: "Inequality operates at multiple levels simultaneously: Internal (privilege, bias, internalized narratives), External (interpersonal, institutional, structural), Central Forces (power, economics, history, culture, identity). Personal interactions happen within these larger systems.", tag: "Framework"},
+    {q: "What are the three components of Interpersonal Influence?", a: "Personal Referent Power (who you are — authenticity, trust, vulnerability), Role Model Norms (modeling behavior you want to see — warmth, care, willingness to disagree), Interpersonal Influence Skills (active listening, feedback, clear communication).", tag: "Framework"},
+    {q: "Explain Warmth vs. Competence (Amy Cuddy).", a: "Two dimensions people evaluate you on. Warmth assessed first, carries more weight. High Warmth + High Competence = admired & trusted. Low Warmth + High Competence = feared. Critical insight for MBA students: lead with warmth first, then demonstrate competence.", tag: "Model"},
+    {q: "What is Honorable Closure?", a: "Ending relationships/experiences with intention: 1) What's unfinished? 2) Accept it? 3) Raise it? Three levels of unfinished business: Intrapersonal (more to share about yourself), Interpersonal (repair/strengthen specific connections), Group (belonging/inclusion).", tag: "Practice"},
+    {q: "What are the four Connecting Across Differences skill adaptations?", a: "Self-Awareness (know your social identities and blind spots), Social Awareness (understand others navigate different realities), Self-Management (manage discomfort, resist urge to defend), Relationship Skills (build bridges, address power dynamics directly).", tag: "Skill Areas"},
+    {q: "What are Interactional Patterns in groups?", a: "Hot Seat (one person always focus), Sustained Pair (two people engage while others watch), Unequal Airtime (some voices dominate), By-pass (individuals get skipped), Sub-groups Dominate (cliques), Popcorn (surface-level exchanges).", tag: "Tool"},
+    {q: "What is the 'Shrunken Share' in the Net Model?", a: "Of everything we think, feel, and intend, only a tiny sliver makes it into Shared Reality. Most data needed for understanding is missing from the conversation. OB374 encourages expanding the share through disclosure and the sentence stem.", tag: "Framework"},
+    {q: "How does feedback expand the Johari Window?", a: "Feedback moves information from the Blind Spot (things others see that you don't) to the Open area. It gives you data you literally cannot access any other way. That's why receiving feedback is a gift.", tag: "Practice"},
+    {q: "What is 'affect labeling'?", a: "Research shows that specifically naming emotions actually reduces their intensity. The more granular your vocabulary, the more agency you have. This is why the 'R' in REAP (Recognize) is so powerful.", tag: "Concept"},
+    {q: "What is the difference between safety and comfort in T-groups?", a: "Psychological safety does NOT mean everyone feels comfortable. Growth requires discomfort. Safety means you won't be punished or humiliated for taking interpersonal risks — not that the risks won't feel scary.", tag: "Concept"},
+    {q: "What are the three T-Group Learning Pillars?", a: "Goals (try new skills or share personally), Self-Awareness (notice thoughts, assumptions, underlying feelings), Reactions (share in service of own or others' learning and relationship).", tag: "Concept"},
+    {q: "What is the fundamental error according to the Net Model?", a: "We judge ourselves by our intent but judge others by their impact on us. You know what you meant; I only know how it felt to me. The Net Model teaches you to bridge this gap.", tag: "Framework"},
+    {q: "What are the stages of Group Development?", a: "Forming (politeness, caution) → Storming (conflict, power struggles) → Deeper engagement (authenticity, productive conflict). Progress isn't linear — groups can regress under stress.", tag: "Concept"},
+    {q: "How does SCARF apply to giving feedback?", a: "Before giving feedback, ask which SCARF domains you might threaten. Give it privately (protects Status), frame as 'I'd like your perspective' (protects Autonomy), start with appreciation (rewards Relatedness), be transparent about intent (rewards Certainty and Fairness).", tag: "Framework"},
+    {q: "What is Social Identity Development?", a: "Three stages: Unawareness (not conscious of group membership), Exploration (examining what identities mean), Integration (complex understanding of identities and power). People at different stages struggle to communicate about these topics.", tag: "Concept"},
+    {q: "What makes the sentence stem so powerful?", a: "It separates observable behavior (Shared Reality) from your interpretation (Your Reality), takes ownership of your feelings, and moves toward resolution. It's almost impossible to argue with because it's about YOUR experience.", tag: "Tool"},
+    {q: "What is the Virginia Satir quote that captures OB 374?", a: "\"I want to love you without clutching, appreciate you without judging, join you without invading, invite you without demanding, leave you without guilt, criticize you without blaming, and help you without insulting.\"", tag: "Integration"},
+    {q: "What are the four situational factors in influence?", a: "Timing (reading emotional temperature), Relationship History (trust built over time), Power Dynamics (formal and informal), Group Norms (explicit and implicit rules that enable or constrain influence).", tag: "Concept"},
+    {q: "What are tips for receiving feedback?", a: "Listen fully before responding. Notice your body (flooding?). Say 'Thank you' first. Get curious: 'Tell me more.' You don't have to agree — just receive the data and process it later.", tag: "Practice"}
+  ];
+
+  let currentCardIndex = 0;
+
+  function updateCard() {
+    const card = flashcards[currentCardIndex];
+    cardQuestion.textContent = card.q;
+    cardAnswer.innerHTML = card.a;
+    cardTag.textContent = card.tag;
+    cardIndex.textContent = currentCardIndex + 1;
+    flashcardInner.classList.remove('flipped');
+  }
+
+  flashToggle.addEventListener('click', () => {
+    flashcardOverlay.classList.add('show');
+    updateCard();
+  });
+
+  flashcardInner.addEventListener('click', () => {
+    flashcardInner.classList.toggle('flipped');
+  });
+
+  fcNext.addEventListener('click', () => {
+    currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+    updateCard();
+  });
+
+  fcPrev.addEventListener('click', () => {
+    currentCardIndex = (currentCardIndex - 1 + flashcards.length) % flashcards.length;
+    updateCard();
+  });
+
+  fcClose.addEventListener('click', () => {
+    flashcardOverlay.classList.remove('show');
+  });
+
+  document.getElementById('cardTotal').textContent = flashcards.length;
+</script>
+  <!-- Fixed Controls -->
+  <div class="fixed-controls">
+    <button class="control-btn dark-toggle" id="darkToggle" title="Toggle dark mode">🌙</button>
+    <button class="control-btn search-toggle" id="searchToggle" title="Search frameworks">🔍</button>
+    <button class="control-btn flash-toggle" id="flashToggle" title="Flashcard mode">📇</button>
+  </div>
+
+  <!-- Search Overlay -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-container">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search frameworks, models, concepts...">
+      <div class="search-results" id="searchResults"></div>
+      <div class="search-count" id="searchCount"></div>
+    </div>
+  </div>
+
+  <!-- Flashcard Overlay -->
+  <div class="flashcard-overlay" id="flashcardOverlay">
+    <div class="flashcard-header">
+      <h2>OB 374 Flashcards</h2>
+      <p class="flashcard-progress"><span id="cardIndex">1</span> / <span id="cardTotal">40</span></p>
+    </div>
+    <div class="flashcard-wrapper">
+      <div class="flashcard-inner" id="flashcardInner">
+        <div class="flashcard-face flashcard-front">
+          <h3 id="cardQuestion">Click to flip for answer</h3>
+          <p class="hint">Click card to flip</p>
+        </div>
+        <div class="flashcard-face flashcard-back">
+          <p id="cardAnswer">Answer goes here</p>
+          <p class="tag" id="cardTag">Concept</p>
+        </div>
+      </div>
+    </div>
+    <div class="flashcard-nav">
+      <button class="fc-prev" id="fcPrev">← Previous</button>
+      <button class="fc-next" id="fcNext">Next →</button>
+      <button class="fc-close" id="fcClose">Close</button>
+    </div>
+  </div>
+</body>
+</html>
