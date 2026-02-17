@@ -2235,23 +2235,37 @@
 
   revealElements.forEach(el => observer.observe(el));
 
-  // Bookmarking system
-  const bookmarks = {};
-  
+  // Bookmarking system (persisted via localStorage)
+  const BOOKMARK_KEY = 'cim-bookmarks';
+  const bookmarks = JSON.parse(localStorage.getItem(BOOKMARK_KEY) || '{}');
+
+  // Restore bookmarks on load
+  document.querySelectorAll('.section').forEach(section => {
+    section.querySelectorAll('.card').forEach((card, idx) => {
+      const key = `${section.id}-${idx}`;
+      if (bookmarks[key]) {
+        card.classList.add('bookmarked');
+        const btn = card.querySelector('.bookmark-btn');
+        if (btn) btn.classList.add('active');
+      }
+    });
+  });
+
   function toggleBookmark(btn) {
     btn.classList.toggle('active');
     const card = btn.closest('.card');
     card.classList.toggle('bookmarked');
-    
+
     const cardId = Array.from(card.parentElement.children).indexOf(card);
     const section = card.closest('.section').id;
     const key = `${section}-${cardId}`;
-    
+
     if (btn.classList.contains('active')) {
       bookmarks[key] = true;
     } else {
       delete bookmarks[key];
     }
+    localStorage.setItem(BOOKMARK_KEY, JSON.stringify(bookmarks));
   }
 
   function filterBookmarks(section) {

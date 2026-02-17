@@ -25,6 +25,21 @@
     --hero-bg: #1a1a2e;
   }
 
+  [data-theme="dark"] {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card-hover: #334155;
+    --accent: #d4a017;
+    --accent2: #e06b55;
+    --accent3: #4da8d4;
+    --accent4: #4da84d;
+    --accent5: #a06cc0;
+    --text: #f1f5f9;
+    --text-dim: #94a3b8;
+    --border: #475569;
+    --hero-bg: #0c1222;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
@@ -140,6 +155,34 @@
     font-weight: 600;
   }
   .nav-btn.assistant-btn:hover { opacity: 0.9; }
+
+  [data-theme="dark"] .nav-strip {
+    background: rgba(15,23,42,0.95);
+  }
+  [data-theme="dark"] .nav-btn:hover { background: var(--card-hover); }
+
+  /* Dark Mode Toggle */
+  .dark-mode-toggle {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--hero-bg);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    z-index: 200;
+  }
+  .dark-mode-toggle:hover { transform: scale(1.1); }
+  [data-theme="dark"] .dark-mode-toggle { background: var(--accent); }
 
   /* Sections */
   .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
@@ -1399,7 +1442,27 @@
   Winning Writing &middot; Glenn Kramon &middot; Stanford GSB &middot; Dashboard for Doca
 </footer>
 
+<button class="dark-mode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
+
 <script>
+// ===== DARK MODE =====
+(function() {
+  const toggle = document.getElementById('darkModeToggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('theme') ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  if (saved === 'dark') {
+    html.setAttribute('data-theme', 'dark');
+    toggle.textContent = '☀️';
+  }
+  toggle.addEventListener('click', () => {
+    const next = (html.getAttribute('data-theme') || 'light') === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+  });
+})();
+
 // ===== FLASHCARD DATA =====
 const allFlashcards = [
   // === BASICS (15) ===

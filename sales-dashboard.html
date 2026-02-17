@@ -1601,12 +1601,28 @@
     darkModeToggle.textContent = isDark ? '🌙' : '☀️';
   });
 
-  // Bookmarking
-  document.querySelectorAll('.bookmark-btn').forEach(btn => {
+  // Bookmarking (persisted via localStorage)
+  const BOOKMARK_KEY = 'sales-bookmarks';
+  const savedBookmarks = JSON.parse(localStorage.getItem(BOOKMARK_KEY) || '{}');
+
+  document.querySelectorAll('.bookmark-btn').forEach((btn, idx) => {
+    // Restore saved state
+    if (savedBookmarks[idx]) {
+      btn.parentElement.classList.add('bookmarked');
+      btn.textContent = '★';
+    }
+
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       btn.parentElement.classList.toggle('bookmarked');
-      btn.textContent = btn.parentElement.classList.contains('bookmarked') ? '★' : '☆';
+      const isBookmarked = btn.parentElement.classList.contains('bookmarked');
+      btn.textContent = isBookmarked ? '★' : '☆';
+      if (isBookmarked) {
+        savedBookmarks[idx] = true;
+      } else {
+        delete savedBookmarks[idx];
+      }
+      localStorage.setItem(BOOKMARK_KEY, JSON.stringify(savedBookmarks));
     });
   });
 
